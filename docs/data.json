@@ -1,0 +1,51 @@
+{
+  "Data": {
+      "Business": {
+          "Name": "string",
+          "Url": "string",
+          "Category": "String [Label]",
+          "Claimed": "boolean",
+          "HasWebsite": "boolean",
+          "Stars": "int",
+          "Reviews": "int",
+          "Photos": "int",
+
+          "MenuCount": "int",
+          "MenuStartsCount": "int ???",
+          "MenuReviewsCount": "int",
+          "MenuPhotosCount": "int",
+
+          "OpenHour1": "float",
+          "EndHour1": "float",
+          "CountHour1": "float",
+          "OpenHour2": "float",
+          "EndHour2": "float",
+          "CountHour2": "float",
+          "OpenHour3": "float",
+          "EndHour3": "float",
+          "CountHour3": "float",
+          "OpenHour4": "float",
+          "EndHour4": "float",
+          "CountHour4": "float",
+          "OpenHour5": "float",
+          "EndHour5": "float",
+          "CountHour5": "float",
+          "OpenHour6": "float",
+          "EndHour6": "float",
+          "CountHour6": "float",
+          "OpenHour7": "float",
+          "EndHour7": "float",
+          "CountHour7": "float",
+
+          "WeeklyHours": "float",
+          "WeeklyDays": "int",
+
+          "Attributes Has": ["Boolean Array per Category"],
+          "AttributesCount": "int",
+          "QuestionsCount": "int"
+      }
+  },
+  "Target": {
+      "ExpensiveLevel": [0, 1, 2, 3, 4]
+  }
+}

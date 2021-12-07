@@ -1,0 +1,16 @@
+{
+    "domain": "www.yelp.com",
+    "url": "https://www.yelp.com",
+    "robots.txt": "https://www.yelp.com/robots.txt",
+
+    "All Category": null,
+    "Category Format": null,
+    "Business Format": "https://www.yelp.com/biz/{sub-name}",
+
+
+    "examples": [
+        "https://www.yelp.com/biz/lily-san-francisco?osq=Restaurants",
+        "https://www.yelp.com/biz/dumpling-park-san-francisco-7",
+        "https://www.yelp.com/biz/merchant-roots-san-francisco?osq=Restaurants"
+    ]
+}
