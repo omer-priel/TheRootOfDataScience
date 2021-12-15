@@ -21,9 +21,15 @@ Omer Priel
 * Handle null fields by Remove / Fill / etc... them
 
 ## Display
+* Display Target Ratio
 * Describe the Data
 * Display the Data
 
 ## Preprocess
 * Handle Exceptions by Remove them or create different Model for them
 * Handle Text and Categorial Attributes
+
+## ??? \ Visual and Description
+* Linear Correlation Matrix (Option)
+* Describe our performance metrics
+* 
