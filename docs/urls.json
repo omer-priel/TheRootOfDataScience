@@ -2,6 +2,9 @@
     "domain": "www.yelp.com",
     "url": "https://www.yelp.com",
     "robots.txt": "https://www.yelp.com/robots.txt",
+    "api": "https://www.yelp.com/developers/documentation/v3/business_search",
+    "api_in_github": "https://github.com/Yelp/yelp-python",
+
 
     "All Category": null,
     "Category Format": null,
