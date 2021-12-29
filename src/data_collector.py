@@ -20,14 +20,13 @@ def httpRequest(url: str):
 
     return soup
 
-def readCSV(name: str, index_label='id'):
+def readCSV(name: str, index_label='id') -> pd.DataFrame:
     return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
 
 def saveCSV(df: pd.DataFrame, name: str, index_label='id'):
     df.to_csv('../data/' + name + '.csv', index_label=index_label)
 
-# Entry Point
-
+# Classes
 busines_template = {
     'Name': None,
     'Url': None,
@@ -57,7 +56,7 @@ for i in range(1, 8):
 def empty_busines():
     return busines_template.copy()
 
-# collectors
+# Collectors
 def collectLocations():
     soup = httpRequest('https://www.yelp.com/locations')
     links = soup.select('.cities a')
@@ -67,16 +66,32 @@ def collectLocations():
 
     locations = pd.Series(locations)
     locations = locations.sort_values().tolist()
-    df = pd.DataFrame({'Name': locations, 'Collected': np.zeros(len(locations))})
+    df = pd.DataFrame({'Name': locations, 'Collected': np.full(len(locations), False)})
     saveCSV(df, 'locations')
+    saveCSV(df, 'original/locations')
 
-def collectUrl():
-    pass
+def collectUrl(locations: pd.DataFrame):
+    indexes = locations[locations['Collected'] == False].index.tolist()
+    if len(indexes) == 0:
+        return False
+    locationID = indexes[0]
+    locationName = locations.iloc[locationID]['Name']
+
+    print(locationName)
+
+    locations.at[[locationID], 'Collected'] = True
+    return True
 
 def collectUrls():
-    pass
+    locations = readCSV('locations')
 
-def collectPage(url):
+    hasNext = True
+    while hasNext:
+        hasNext = collectUrl(locations)
+
+    saveCSV(locations, 'locations')
+
+def collectPage(url: str):
     busines = empty_busines()
     busines['Loaded'] = False
     busines['Url'] = url
@@ -93,9 +108,10 @@ def collectPage(url):
 
     print(footer.getText())
 
+# Entry Point
 
-collectLocations()
+# collectLocations()
 
-df = readCSV('locations')
+collectUrls()
 
 #collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')

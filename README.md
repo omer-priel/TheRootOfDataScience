@@ -28,6 +28,7 @@ Omer Priel
 ## Preprocess
 * Handle Exceptions by Remove them or create different Model for them
 * Handle Text and Categorial Attributes
+* Scaling
 
 ## ??? \ Visual and Description
 * Linear Correlation Matrix (Option)
