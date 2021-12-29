@@ -6,8 +6,9 @@
     "api_in_github": "https://github.com/Yelp/yelp-python",
 
 
-    "All Category": null,
-    "Category Format": null,
+    "All Locations": "https://www.yelp.com/locations",
+    "Business Search": "#https://www.yelp.com/search?find_loc={location}&start={start}",
+    "Business Search Category": "#https://www.yelp.com/search?find_desc={category}find_loc={location}&&start={start}",
     "Business Format": "https://www.yelp.com/biz/{sub-name}",
 
 

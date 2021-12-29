@@ -1,0 +1,220 @@
+id,Name,Collected
+0,Adelaide,0.0
+1,Alameda,0.0
+2,Albany,0.0
+3,Albuquerque,0.0
+4,Alexandria,0.0
+5,Alhambra,0.0
+6,Allston,0.0
+7,Amsterdam,0.0
+8,Anaheim,0.0
+9,Ann Arbor,0.0
+10,Antwerpen,0.0
+11,Arlington,0.0
+12,Atlanta,0.0
+13,Auckland,0.0
+14,Austin,0.0
+15,Baltimore,0.0
+16,Barcelona,0.0
+17,Belfast,0.0
+18,Bellevue,0.0
+19,Belmont,0.0
+20,Berkeley,0.0
+21,Berlin,0.0
+22,Beverly Hills,0.0
+23,Big Sur,0.0
+24,Bloomington,0.0
+25,Boise,0.0
+26,Boston,0.0
+27,Boulder,0.0
+28,Brighton,0.0
+29,Brighton,0.0
+30,Brisbane,0.0
+31,Bristol,0.0
+32,Brookline,0.0
+33,Brooklyn,0.0
+34,Bruxelles,0.0
+35,Buenos Aires,0.0
+36,Burbank,0.0
+37,Burlington,0.0
+38,Calgary,0.0
+39,Cambridge,0.0
+40,Cardiff,0.0
+41,Charleston,0.0
+42,Charlotte,0.0
+43,Chicago,0.0
+44,Cincinnati,0.0
+45,Cleveland,0.0
+46,Columbus,0.0
+47,Concord,0.0
+48,Costa Mesa,0.0
+49,Culver City,0.0
+50,Cupertino,0.0
+51,Dallas,0.0
+52,Daly City,0.0
+53,Davis,0.0
+54,Denver,0.0
+55,Detroit,0.0
+56,Dublin,0.0
+57,Dublin,0.0
+58,Durham,0.0
+59,Edinburgh,0.0
+60,Edmonton,0.0
+61,Emeryville,0.0
+62,Evanston,0.0
+63,Flushing,0.0
+64,Fort Lauderdale,0.0
+65,Foster City,0.0
+66,Frankfurt am Main,0.0
+67,Fremont,0.0
+68,Gainesville,0.0
+69,Glasgow,0.0
+70,Glendale,0.0
+71,Halifax,0.0
+72,Hamburg,0.0
+73,Hartford,0.0
+74,Hayward,0.0
+75,Healdsburg,0.0
+76,Helsinki,0.0
+77,Honolulu,0.0
+78,Houston,0.0
+79,Huntington Beach,0.0
+80,Indianapolis,0.0
+81,Iowa City,0.0
+82,Irvine,0.0
+83,Kansas City,0.0
+84,Kraków,0.0
+85,Kuala Lumpur,0.0
+86,Köln,0.0
+87,København,0.0
+88,La Jolla,0.0
+89,Lahaina,0.0
+90,Las Vegas,0.0
+91,Leeds,0.0
+92,Lisboa,0.0
+93,Livermore,0.0
+94,Liverpool,0.0
+95,London,0.0
+96,Long Beach,0.0
+97,Long Island City,0.0
+98,Los Altos,0.0
+99,Los Angeles,0.0
+100,Los Gatos,0.0
+101,Louisville,0.0
+102,Lyon,0.0
+103,Madison,0.0
+104,Madrid,0.0
+105,Manchester,0.0
+106,Manila,0.0
+107,Marina del Rey,0.0
+108,Marseille,0.0
+109,Melbourne,0.0
+110,Memphis,0.0
+111,Menlo Park,0.0
+112,Miami,0.0
+113,Miami Beach,0.0
+114,Milano,0.0
+115,Mill Valley,0.0
+116,Millbrae,0.0
+117,Milpitas,0.0
+118,Milwaukee,0.0
+119,Minneapolis,0.0
+120,Monterey,0.0
+121,Montréal,0.0
+122,Mountain View,0.0
+123,"México, D.F.",0.0
+124,München,0.0
+125,Napa,0.0
+126,Naperville,0.0
+127,Nashville,0.0
+128,New Haven,0.0
+129,New Orleans,0.0
+130,New York,0.0
+131,Newark,0.0
+132,Newark,0.0
+133,Newport Beach,0.0
+134,Oakland,0.0
+135,Orange County,0.0
+136,Orlando,0.0
+137,Oslo,0.0
+138,Ottawa,0.0
+139,Palo Alto,0.0
+140,Paris,0.0
+141,Park La Brea,0.0
+142,Pasadena,0.0
+143,Perth,0.0
+144,Philadelphia,0.0
+145,Phoenix,0.0
+146,Pittsburgh,0.0
+147,Pleasanton,0.0
+148,Portland,0.0
+149,Praha,0.0
+150,Princeton,0.0
+151,Providence,0.0
+152,Raleigh,0.0
+153,Redmond,0.0
+154,Redondo Beach,0.0
+155,Redwood City,0.0
+156,Reno,0.0
+157,Richmond,0.0
+158,Rio de Janeiro,0.0
+159,Roma,0.0
+160,Sacramento,0.0
+161,Saint Louis,0.0
+162,Saint Paul,0.0
+163,Salem,0.0
+164,Salt Lake City,0.0
+165,San Antonio,0.0
+166,San Bruno,0.0
+167,San Carlos,0.0
+168,San Diego,0.0
+169,San Francisco,0.0
+170,San Jose,0.0
+171,San Leandro,0.0
+172,San Mateo,0.0
+173,San Rafael,0.0
+174,Santa Barbara,0.0
+175,Santa Clara,0.0
+176,Santa Cruz,0.0
+177,Santa Fe,0.0
+178,Santa Monica,0.0
+179,Santa Rosa,0.0
+180,Santiago,0.0
+181,Sausalito,0.0
+182,Savannah,0.0
+183,Schaumburg,0.0
+184,Scottsdale,0.0
+185,Seattle,0.0
+186,Singapore,0.0
+187,Skokie,0.0
+188,Somerville,0.0
+189,Sonoma,0.0
+190,South Lake Tahoe,0.0
+191,Stockholm,0.0
+192,Stockton,0.0
+193,Studio City,0.0
+194,Sunnyvale,0.0
+195,Sydney,0.0
+196,São Paulo,0.0
+197,Tampa,0.0
+198,Tempe,0.0
+199,Toronto,0.0
+200,Torrance,0.0
+201,Tucson,0.0
+202,Union City,0.0
+203,Vancouver,0.0
+204,Venice,0.0
+205,Walnut Creek,0.0
+206,Warszawa,0.0
+207,"Washington, DC",0.0
+208,West Hollywood,0.0
+209,West Los Angeles,0.0
+210,Westwood,0.0
+211,Wien,0.0
+212,Yountville,0.0
+213,Zürich,0.0
+214,İstanbul,0.0
+215,台北市,0.0
+216,大阪市,0.0
+217,東京,0.0
+218,香港,0.0

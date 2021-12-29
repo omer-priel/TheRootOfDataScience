@@ -14,11 +14,17 @@ import pandas as pd
 
 
 # Utilities
-def httpRequest(url):
+def httpRequest(url: str):
     res = requests.get(url)
     soup = BeautifulSoup(res.content, 'html.parser')
 
     return soup
+
+def readCSV(name: str, index_label='id'):
+    return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
+
+def saveCSV(df: pd.DataFrame, name: str, index_label='id'):
+    df.to_csv('../data/' + name + '.csv', index_label=index_label)
 
 # Entry Point
 
@@ -51,6 +57,25 @@ for i in range(1, 8):
 def empty_busines():
     return busines_template.copy()
 
+# collectors
+def collectLocations():
+    soup = httpRequest('https://www.yelp.com/locations')
+    links = soup.select('.cities a')
+    locations = []
+    while len(links) > 0:
+        locations.append(links.pop().getText())
+
+    locations = pd.Series(locations)
+    locations = locations.sort_values().tolist()
+    df = pd.DataFrame({'Name': locations, 'Collected': np.zeros(len(locations))})
+    saveCSV(df, 'locations')
+
+def collectUrl():
+    pass
+
+def collectUrls():
+    pass
+
 def collectPage(url):
     busines = empty_busines()
     busines['Loaded'] = False
@@ -68,4 +93,9 @@ def collectPage(url):
 
     print(footer.getText())
 
-collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
+
+collectLocations()
+
+df = readCSV('locations')
+
+#collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
