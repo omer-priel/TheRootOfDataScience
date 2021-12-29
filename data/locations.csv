@@ -1,220 +1,212 @@
 id,Name,Collected
-0,Adelaide,True
-1,Alameda,True
-2,Albany,True
-3,Albuquerque,True
-4,Alexandria,True
-5,Alhambra,True
-6,Allston,True
-7,Amsterdam,True
-8,Anaheim,True
-9,Ann Arbor,True
-10,Antwerpen,True
-11,Arlington,True
-12,Atlanta,True
-13,Auckland,True
-14,Austin,True
-15,Baltimore,True
-16,Barcelona,True
-17,Belfast,True
-18,Bellevue,True
-19,Belmont,True
-20,Berkeley,True
-21,Berlin,True
-22,Beverly Hills,True
-23,Big Sur,True
-24,Bloomington,True
-25,Boise,True
-26,Boston,True
-27,Boulder,True
-28,Brighton,True
-29,Brighton,True
-30,Brisbane,True
-31,Bristol,True
-32,Brookline,True
-33,Brooklyn,True
-34,Bruxelles,True
-35,Buenos Aires,True
-36,Burbank,True
-37,Burlington,True
-38,Calgary,True
-39,Cambridge,True
-40,Cardiff,True
-41,Charleston,True
-42,Charlotte,True
-43,Chicago,True
-44,Cincinnati,True
-45,Cleveland,True
-46,Columbus,True
-47,Concord,True
-48,Costa Mesa,True
-49,Culver City,True
-50,Cupertino,True
-51,Dallas,True
-52,Daly City,True
-53,Davis,True
-54,Denver,True
-55,Detroit,True
-56,Dublin,True
-57,Dublin,True
-58,Durham,True
-59,Edinburgh,True
-60,Edmonton,True
-61,Emeryville,True
-62,Evanston,True
-63,Flushing,True
-64,Fort Lauderdale,True
-65,Foster City,True
-66,Frankfurt am Main,True
-67,Fremont,True
-68,Gainesville,True
-69,Glasgow,True
-70,Glendale,True
-71,Halifax,True
-72,Hamburg,True
-73,Hartford,True
-74,Hayward,True
-75,Healdsburg,True
-76,Helsinki,True
-77,Honolulu,True
-78,Houston,True
-79,Huntington Beach,True
-80,Indianapolis,True
-81,Iowa City,True
-82,Irvine,True
-83,Kansas City,True
-84,Kraków,True
-85,Kuala Lumpur,True
-86,Köln,True
-87,København,True
-88,La Jolla,True
-89,Lahaina,True
-90,Las Vegas,True
-91,Leeds,True
-92,Lisboa,True
-93,Livermore,True
-94,Liverpool,True
-95,London,True
-96,Long Beach,True
-97,Long Island City,True
-98,Los Altos,True
-99,Los Angeles,True
-100,Los Gatos,True
-101,Louisville,True
-102,Lyon,True
-103,Madison,True
-104,Madrid,True
-105,Manchester,True
-106,Manila,True
-107,Marina del Rey,True
-108,Marseille,True
-109,Melbourne,True
-110,Memphis,True
-111,Menlo Park,True
-112,Miami,True
-113,Miami Beach,True
-114,Milano,True
-115,Mill Valley,True
-116,Millbrae,True
-117,Milpitas,True
-118,Milwaukee,True
-119,Minneapolis,True
-120,Monterey,True
-121,Montréal,True
-122,Mountain View,True
-123,"México, D.F.",True
-124,München,True
-125,Napa,True
-126,Naperville,True
-127,Nashville,True
-128,New Haven,True
-129,New Orleans,True
-130,New York,True
-131,Newark,True
-132,Newark,True
-133,Newport Beach,True
-134,Oakland,True
-135,Orange County,True
-136,Orlando,True
-137,Oslo,True
-138,Ottawa,True
-139,Palo Alto,True
-140,Paris,True
-141,Park La Brea,True
-142,Pasadena,True
-143,Perth,True
-144,Philadelphia,True
-145,Phoenix,True
-146,Pittsburgh,True
-147,Pleasanton,True
-148,Portland,True
-149,Praha,True
-150,Princeton,True
-151,Providence,True
-152,Raleigh,True
-153,Redmond,True
-154,Redondo Beach,True
-155,Redwood City,True
-156,Reno,True
-157,Richmond,True
-158,Rio de Janeiro,True
-159,Roma,True
-160,Sacramento,True
-161,Saint Louis,True
-162,Saint Paul,True
-163,Salem,True
-164,Salt Lake City,True
-165,San Antonio,True
-166,San Bruno,True
-167,San Carlos,True
-168,San Diego,True
-169,San Francisco,True
-170,San Jose,True
-171,San Leandro,True
-172,San Mateo,True
-173,San Rafael,True
-174,Santa Barbara,True
-175,Santa Clara,True
-176,Santa Cruz,True
-177,Santa Fe,True
-178,Santa Monica,True
-179,Santa Rosa,True
-180,Santiago,True
-181,Sausalito,True
-182,Savannah,True
-183,Schaumburg,True
-184,Scottsdale,True
-185,Seattle,True
-186,Singapore,True
-187,Skokie,True
-188,Somerville,True
-189,Sonoma,True
-190,South Lake Tahoe,True
-191,Stockholm,True
-192,Stockton,True
-193,Studio City,True
-194,Sunnyvale,True
-195,Sydney,True
-196,São Paulo,True
-197,Tampa,True
-198,Tempe,True
-199,Toronto,True
-200,Torrance,True
-201,Tucson,True
-202,Union City,True
-203,Vancouver,True
-204,Venice,True
-205,Walnut Creek,True
-206,Warszawa,True
-207,"Washington, DC",True
-208,West Hollywood,True
-209,West Los Angeles,True
-210,Westwood,True
-211,Wien,True
-212,Yountville,True
-213,Zürich,True
-214,İstanbul,True
-215,台北市,True
-216,大阪市,True
-217,東京,True
-218,香港,True
+0,Adelaide,False
+1,Alameda,False
+2,Albany,False
+3,Albuquerque,False
+4,Alexandria,False
+5,Alhambra,False
+6,Allston,False
+7,Amsterdam,False
+8,Anaheim,False
+9,Ann Arbor,False
+10,Antwerpen,False
+11,Arlington,False
+12,Atlanta,False
+13,Auckland,False
+14,Austin,False
+15,Baltimore,False
+16,Barcelona,False
+17,Belfast,False
+18,Bellevue,False
+19,Belmont,False
+20,Berkeley,False
+21,Berlin,False
+22,Beverly Hills,False
+23,Big Sur,False
+24,Bloomington,False
+25,Boise,False
+26,Boston,False
+27,Boulder,False
+28,Brighton,False
+29,Brighton,False
+30,Brisbane,False
+31,Bristol,False
+32,Brookline,False
+33,Brooklyn,False
+34,Bruxelles,False
+35,Buenos Aires,False
+36,Burbank,False
+37,Burlington,False
+38,Calgary,False
+39,Cambridge,False
+40,Cardiff,False
+41,Charleston,False
+42,Charlotte,False
+43,Chicago,False
+44,Cincinnati,False
+45,Cleveland,False
+46,Columbus,False
+47,Concord,False
+48,Costa Mesa,False
+49,Culver City,False
+50,Cupertino,False
+51,Dallas,False
+52,Daly City,False
+53,Davis,False
+54,Denver,False
+55,Detroit,False
+56,Dublin,False
+57,Dublin,False
+58,Durham,False
+59,Edinburgh,False
+60,Edmonton,False
+61,Emeryville,False
+62,Evanston,False
+63,Flushing,False
+64,Fort Lauderdale,False
+65,Foster City,False
+66,Frankfurt am Main,False
+67,Fremont,False
+68,Gainesville,False
+69,Glasgow,False
+70,Glendale,False
+71,Halifax,False
+72,Hamburg,False
+73,Hartford,False
+74,Hayward,False
+75,Healdsburg,False
+76,Helsinki,False
+77,Honolulu,False
+78,Houston,False
+79,Huntington Beach,False
+80,Indianapolis,False
+81,Iowa City,False
+82,Irvine,False
+83,Kansas City,False
+84,Kraków,False
+85,Kuala Lumpur,False
+86,Köln,False
+87,København,False
+88,La Jolla,False
+89,Lahaina,False
+90,Las Vegas,False
+91,Leeds,False
+92,Lisboa,False
+93,Livermore,False
+94,Liverpool,False
+95,London,False
+96,Long Beach,False
+97,Long Island City,False
+98,Los Altos,False
+99,Los Angeles,False
+100,Los Gatos,False
+101,Louisville,False
+102,Lyon,False
+103,Madison,False
+104,Madrid,False
+105,Manchester,False
+106,Manila,False
+107,Marina del Rey,False
+108,Marseille,False
+109,Melbourne,False
+110,Memphis,False
+111,Menlo Park,False
+112,Miami,False
+113,Miami Beach,False
+114,Milano,False
+115,Mill Valley,False
+116,Millbrae,False
+117,Milpitas,False
+118,Milwaukee,False
+119,Minneapolis,False
+120,Monterey,False
+121,Montréal,False
+122,Mountain View,False
+123,"México, D.F.",False
+124,München,False
+125,Napa,False
+126,Naperville,False
+127,Nashville,False
+128,New Haven,False
+129,New Orleans,False
+130,New York,False
+131,Newark,False
+132,Newark,False
+133,Newport Beach,False
+134,Oakland,False
+135,Orange County,False
+136,Orlando,False
+137,Oslo,False
+138,Ottawa,False
+139,Palo Alto,False
+140,Paris,False
+141,Park La Brea,False
+142,Pasadena,False
+143,Perth,False
+144,Philadelphia,False
+145,Phoenix,False
+146,Pittsburgh,False
+147,Pleasanton,False
+148,Portland,False
+149,Praha,False
+150,Princeton,False
+151,Providence,False
+152,Raleigh,False
+153,Redmond,False
+154,Redondo Beach,False
+155,Redwood City,False
+156,Reno,False
+157,Richmond,False
+158,Rio de Janeiro,False
+159,Roma,False
+160,Sacramento,False
+161,Saint Louis,False
+162,Saint Paul,False
+163,Salem,False
+164,Salt Lake City,False
+165,San Antonio,False
+166,San Bruno,False
+167,San Carlos,False
+168,San Diego,False
+169,San Francisco,False
+170,San Jose,False
+171,San Leandro,False
+172,San Mateo,False
+173,San Rafael,False
+174,Santa Barbara,False
+175,Santa Clara,False
+176,Santa Cruz,False
+177,Santa Fe,False
+178,Santa Monica,False
+179,Santa Rosa,False
+180,Santiago,False
+181,Sausalito,False
+182,Savannah,False
+183,Schaumburg,False
+184,Scottsdale,False
+185,Seattle,False
+186,Singapore,False
+187,Skokie,False
+188,Somerville,False
+189,Sonoma,False
+190,South Lake Tahoe,False
+191,Stockholm,False
+192,Stockton,False
+193,Studio City,False
+194,Sunnyvale,False
+195,Sydney,False
+196,São Paulo,False
+197,Tampa,False
+198,Tempe,False
+199,Toronto,False
+200,Torrance,False
+201,Tucson,False
+202,Union City,False
+203,Vancouver,False
+204,Venice,False
+205,Walnut Creek,False
+206,Warszawa,False
+207,"Washington, DC",False
+208,West Hollywood,False
+209,West Los Angeles,False
+210,Westwood,False

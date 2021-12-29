@@ -65,8 +65,11 @@ def collectLocations():
         locations.append(links.pop().getText())
 
     locations = pd.Series(locations)
-    locations = locations.sort_values().tolist()
-    df = pd.DataFrame({'Name': locations, 'Collected': np.full(len(locations), False)})
+    locations.sort_values(inplace=True)
+
+    df = pd.DataFrame({'Name': locations.tolist(), 'Collected': np.full(len(locations), False)})
+    df.drop(index=df.tail(8).index, inplace=True)
+
     saveCSV(df, 'locations')
     saveCSV(df, 'original/locations')
 
