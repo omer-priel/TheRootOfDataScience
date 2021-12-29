@@ -7,8 +7,8 @@
 
 
     "All Locations": "https://www.yelp.com/locations",
-    "Business Search": "#https://www.yelp.com/search?find_loc={location}&start={start}",
-    "Business Search Category": "#https://www.yelp.com/search?find_desc={category}find_loc={location}&&start={start}",
+    "Business Search": "https://www.yelp.com/search?find_loc={location}&start={start}",
+    "Business Search Category": "https://www.yelp.com/search?find_desc={category}find_loc={location}&&start={start}",
     "Business Format": "https://www.yelp.com/biz/{sub-name}",
 
 

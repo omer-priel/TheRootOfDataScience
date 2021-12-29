@@ -74,14 +74,30 @@ def collectLocations():
     saveCSV(df, 'original/locations')
 
 def collectUrl(locations: pd.DataFrame):
+    # Get Location name
     indexes = locations[locations['Collected'] == False].index.tolist()
     if len(indexes) == 0:
         return False
     locationID = indexes[0]
     locationName = locations.iloc[locationID]['Name']
 
+    # Collect Url
     print(locationName)
+    categoryName = 'Restaurants'
 
+    url = 'https://www.yelp.com/search?find_loc={}&find_desc={}'.format(locationName, categoryName)
+
+    while url != None:
+        print(url)
+        soup = httpRequest(url)
+
+        main = soup.select_one('main ul')
+        print(main.find_all('h3', string="All Results"))
+        print(main.find_all('h3'))
+
+        url = None
+
+    # Set Collected to True
     locations.at[[locationID], 'Collected'] = True
     return True
 
@@ -91,8 +107,9 @@ def collectUrls():
     hasNext = True
     while hasNext:
         hasNext = collectUrl(locations)
+        hasNext = False
 
-    saveCSV(locations, 'locations')
+    #saveCSV(locations, 'locations')
 
 def collectPage(url: str):
     busines = empty_busines()
