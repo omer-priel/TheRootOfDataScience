@@ -89,11 +89,16 @@ def collectUrl(locations: pd.DataFrame):
 
     while url != None:
         print(url)
+        url = 'https://www.yelp.com/search?cflt=restaurants&find_loc=Adelaide%2C+Adelaide+South+Australia'
         soup = httpRequest(url)
 
         main = soup.select_one('main ul')
         print(main.find_all('h3', string="All Results"))
-        print(main.find_all('h3'))
+        print(main.find_all('li div h3'))
+        links = main.find_all('a')
+        for link in links:
+            if link.get('href').find('/biz') != -1:
+                print(link.get('href'))
 
         url = None
 
@@ -130,7 +135,7 @@ def collectPage(url: str):
 
 # Entry Point
 
-# collectLocations()
+#collectLocations()
 
 collectUrls()
 
