@@ -7,6 +7,7 @@ import json
 # Web Scraping
 import requests
 from bs4 import BeautifulSoup
+import re
 
 # Data
 import numpy as np
@@ -117,26 +118,28 @@ def collectUrls():
     #saveCSV(locations, 'locations')
 
 def collectPage(url: str):
-    busines = empty_busines()
-    busines['Loaded'] = False
-    busines['Url'] = url
+    business = empty_busines()
+    business['Loaded'] = False
+    business['Url'] = url
 
     soup = httpRequest(url)
 
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
-    footer = header.parent.findChildren("div", recursive=False)[3]
-
-    print(header.getText())
-
-    print('----------------------------')
-
-    print(footer.getText())
+    ##find the important info in header to be moved to a different function
+    headInfo=header.find(class_=re.compile('photo\-header\-content__.+'))
+    headInfo=headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
+    ##find $$$$ in header
+    ##note this may not work if $ exists in the name to be fixed
+    dollars=headInfo.find(string=re.compile('\$+'))
+     
+    business['ExpensiveLevel']=len(dollars)
+    print(business['ExpensiveLevel'])
 
 # Entry Point
 
 #collectLocations()
 
-collectUrls()
+#collectUrls()
 
-#collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
+collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
