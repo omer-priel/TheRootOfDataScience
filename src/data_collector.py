@@ -129,6 +129,7 @@ def collectUrl(locations: pd.DataFrame):
 
     busines_data['Loaded'] = np.full(len(links), False)
     busines_data['Url'] = new_busines.tolist()
+    busines_data['Category'] = np.full(len(links), categoryName)
 
     df = pd.DataFrame(busines_data)
 
