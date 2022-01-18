@@ -8,14 +8,23 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
+import urllib.parse
+
 # Data
 import numpy as np
 import pandas as pd
 
+# user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36
 
 # Utilities
-def httpRequest(url: str):
-    res = requests.get(url)
+def httpRequest(url: str, useSplash: bool):
+    if useSplash:
+        url = urllib.parse.quote(url)
+        url = 'http://192.168.1.117:8050/render.html?url=' + url
+        res = requests.get(url)
+    else:
+        res = requests.get(url)
+
     soup = BeautifulSoup(res.content, 'html.parser')
 
     return soup
@@ -58,7 +67,7 @@ def empty_busines():
 
 # Collectors
 def collectLocations():
-    soup = httpRequest('https://www.yelp.com/locations')
+    soup = httpRequest('https://www.yelp.com/locations', False)
     links = soup.select('.cities a')
     locations = []
     while len(links) > 0:
@@ -82,25 +91,26 @@ def collectUrl(locations: pd.DataFrame):
     locationName = locations.iloc[locationID]['Name']
 
     # Collect Url
-    print(locationName)
     categoryName = 'Restaurants'
+    print('Collactting \"' + categoryName + '\" in \"' + locationName + '\"')
 
-    url = 'https://www.yelp.com/search?find_loc={}&find_desc={}'.format(locationName, categoryName)
+    links = []
+
+    startParam = 0
+    url = ""
 
     while url != None:
+        url = 'https://www.yelp.com/search?find_loc={}&find_desc={}&start={}'.format(locationName, categoryName, startParam)
+        startParam += 10
         print(url)
-        url = 'https://www.yelp.com/search?cflt=restaurants&find_loc=Adelaide%2C+Adelaide+South+Australia'
-        soup = httpRequest(url)
-
+        soup = httpRequest(url, True)
         main = soup.select_one('main ul')
-        print(main.find_all('h3', string="All Results"))
-        print(main.find_all('li div h3'))
-        links = main.find_all('a')
-        for link in links:
-            if link.get('href').find('/biz') != -1:
-                print(link.get('href'))
-
-        url = None
+        if main == None:
+            url = None
+        else:
+            for link in main.select('a'):
+                if link.get('href').find('/biz/') != -1:
+                    links.append(link.get('href'))
 
     # Set Collected to True
     locations.at[[locationID], 'Collected'] = True
@@ -121,7 +131,7 @@ def collectPage(url: str):
     busines['Loaded'] = False
     busines['Url'] = url
 
-    soup = httpRequest(url)
+    soup = httpRequest(url, False)
 
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
@@ -137,6 +147,6 @@ def collectPage(url: str):
 
 #collectLocations()
 
-collectUrls()
+#collectUrls()
 
 #collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
