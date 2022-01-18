@@ -18,13 +18,13 @@ id,Name,Collected
 16,Barcelona,True
 17,Belfast,True
 18,Bellevue,True
-19,Belmont,False
-20,Berkeley,False
-21,Berlin,False
-22,Beverly Hills,False
-23,Big Sur,False
-24,Bloomington,False
-25,Boise,False
+19,Belmont,True
+20,Berkeley,True
+21,Berlin,True
+22,Beverly Hills,True
+23,Big Sur,True
+24,Bloomington,True
+25,Boise,True
 26,Boston,False
 27,Boulder,False
 28,Brighton,False
