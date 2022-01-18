@@ -19,6 +19,7 @@ import pandas as pd
 # Utilities
 def httpRequest(url: str, useSplash: bool):
     if useSplash:
+        print(url)
         url = urllib.parse.quote(url)
         url = 'http://192.168.1.117:8050/render.html?url=' + url
         res = requests.get(url)
@@ -90,7 +91,7 @@ def collectUrl(locations: pd.DataFrame):
     locationID = indexes[0]
     locationName = locations.iloc[locationID]['Name']
 
-    # Collect Url
+    # Start to Collect Urls
     categoryName = 'Restaurants'
     print('Collactting \"' + categoryName + '\" in \"' + locationName + '\"')
 
@@ -98,11 +99,9 @@ def collectUrl(locations: pd.DataFrame):
 
     startParam = 0
     url = ""
-
     while url != None:
         url = 'https://www.yelp.com/search?find_loc={}&find_desc={}&start={}'.format(locationName, categoryName, startParam)
         startParam += 10
-        print(url)
         soup = httpRequest(url, True)
         main = soup.select_one('main ul')
         if main == None:
@@ -112,8 +111,37 @@ def collectUrl(locations: pd.DataFrame):
                 if link.get('href').find('/biz/') != -1:
                     links.append(link.get('href'))
 
+    
+    print("Create Table For The Data")
+
+    # Remove Duplicates Links
+    links = list(set(links))
+
+    # Save Urls
+    busines = readCSV('busines')
+
+    new_busines = pd.Series(links)
+
+    busines_data = empty_busines()
+
+    for key in busines_data:
+        busines_data[key] = np.full(len(links), None)
+
+    busines_data['Loaded'] = np.full(len(links), False)
+    busines_data['Url'] = new_busines.tolist()
+
+    df = pd.DataFrame(busines_data)
+
+    df.index += len(busines.index)
+
+    busines = pd.concat([busines, df])
+
+    print("Save New Busines to load")
+    saveCSV(busines, 'busines')
+
     # Set Collected to True
     locations.at[[locationID], 'Collected'] = True
+    saveCSV(locations, 'locations')
     return True
 
 def collectUrls():
@@ -122,9 +150,6 @@ def collectUrls():
     hasNext = True
     while hasNext:
         hasNext = collectUrl(locations)
-        hasNext = False
-
-    #saveCSV(locations, 'locations')
 
 def collectPage(url: str):
     busines = empty_busines()
@@ -147,6 +172,6 @@ def collectPage(url: str):
 
 #collectLocations()
 
-#collectUrls()
+collectUrls()
 
 #collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')

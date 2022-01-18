@@ -1,13 +1,13 @@
 id,Name,Collected
-0,Adelaide,False
-1,Alameda,False
-2,Albany,False
-3,Albuquerque,False
-4,Alexandria,False
-5,Alhambra,False
-6,Allston,False
-7,Amsterdam,False
-8,Anaheim,False
+0,Adelaide,True
+1,Alameda,True
+2,Albany,True
+3,Albuquerque,True
+4,Alexandria,True
+5,Alhambra,True
+6,Allston,True
+7,Amsterdam,True
+8,Anaheim,True
 9,Ann Arbor,False
 10,Antwerpen,False
 11,Arlington,False
