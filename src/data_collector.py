@@ -152,6 +152,17 @@ def collectUrls():
     while hasNext:
         hasNext = collectUrl(locations)
 
+def removeDuplicatesUrls():
+    busines = readCSV('busines')
+    print('Before remove ' + str(len(busines.index)))
+
+    busines.drop_duplicates(subset='Url', keep='first', inplace=True)
+    busines.index = np.arange(len(busines.index))
+
+    print('After remove ' + str(len(busines.index)))
+
+    saveCSV(busines, 'busines')
+
 def collectPage(url: str):
     busines = empty_busines()
     busines['Loaded'] = False
@@ -174,5 +185,6 @@ def collectPage(url: str):
 #collectLocations()
 
 #collectUrls()
+#removeDuplicatesUrls()
 
 #collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
