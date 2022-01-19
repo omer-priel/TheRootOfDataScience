@@ -9,14 +9,24 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+import urllib.parse
+
 # Data
 import numpy as np
 import pandas as pd
 
+# user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36
 
 # Utilities
-def httpRequest(url: str):
-    res = requests.get(url)
+def httpRequest(url: str, useSplash: bool):
+    if useSplash:
+        print(url)
+        url = urllib.parse.quote(url)
+        url = 'http://192.168.1.117:8050/render.html?url=' + url
+        res = requests.get(url)
+    else:
+        res = requests.get(url)
+
     soup = BeautifulSoup(res.content, 'html.parser')
 
     return soup
@@ -59,7 +69,7 @@ def empty_busines():
 
 # Collectors
 def collectLocations():
-    soup = httpRequest('https://www.yelp.com/locations')
+    soup = httpRequest('https://www.yelp.com/locations', False)
     links = soup.select('.cities a')
     locations = []
     while len(links) > 0:
@@ -82,29 +92,58 @@ def collectUrl(locations: pd.DataFrame):
     locationID = indexes[0]
     locationName = locations.iloc[locationID]['Name']
 
-    # Collect Url
-    print(locationName)
+    # Start to Collect Urls
     categoryName = 'Restaurants'
+    print('Collactting \"' + categoryName + '\" in \"' + locationName + '\"')
 
-    url = 'https://www.yelp.com/search?find_loc={}&find_desc={}'.format(locationName, categoryName)
+    links = []
 
+    startParam = 0
+    url = ""
     while url != None:
-        print(url)
-        url = 'https://www.yelp.com/search?cflt=restaurants&find_loc=Adelaide%2C+Adelaide+South+Australia'
-        soup = httpRequest(url)
-
+        url = 'https://www.yelp.com/search?find_loc={}&find_desc={}&start={}'.format(locationName, categoryName, startParam)
+        startParam += 10
+        soup = httpRequest(url, True)
         main = soup.select_one('main ul')
-        print(main.find_all('h3', string="All Results"))
-        print(main.find_all('li div h3'))
-        links = main.find_all('a')
-        for link in links:
-            if link.get('href').find('/biz') != -1:
-                print(link.get('href'))
+        if main == None:
+            url = None
+        else:
+            for link in main.select('a'):
+                if link.get('href').find('/biz/') != -1:
+                    links.append(link.get('href'))
 
-        url = None
+    
+    print("Create Table For The Data")
+
+    # Remove Duplicates Links
+    links = list(set(links))
+
+    # Save Urls
+    busines = readCSV('busines')
+
+    new_busines = pd.Series(links)
+
+    busines_data = empty_busines()
+
+    for key in busines_data:
+        busines_data[key] = np.full(len(links), None)
+
+    busines_data['Loaded'] = np.full(len(links), False)
+    busines_data['Url'] = new_busines.tolist()
+    busines_data['Category'] = np.full(len(links), categoryName)
+
+    df = pd.DataFrame(busines_data)
+
+    df.index += len(busines.index)
+
+    busines = pd.concat([busines, df])
+
+    print("Save New Busines to load")
+    saveCSV(busines, 'busines')
 
     # Set Collected to True
     locations.at[[locationID], 'Collected'] = True
+    saveCSV(locations, 'locations')
     return True
 
 def collectUrls():
@@ -113,16 +152,24 @@ def collectUrls():
     hasNext = True
     while hasNext:
         hasNext = collectUrl(locations)
-        hasNext = False
 
-    #saveCSV(locations, 'locations')
+def removeDuplicatesUrls():
+    busines = readCSV('busines')
+    print('Before remove ' + str(len(busines.index)))
+
+    busines.drop_duplicates(subset='Url', keep='first', inplace=True)
+    busines.index = np.arange(len(busines.index))
+
+    print('After remove ' + str(len(busines.index)))
+
+    saveCSV(busines, 'busines')
 
 def collectPage(url: str):
     business = empty_busines()
     business['Loaded'] = False
     business['Url'] = url
 
-    soup = httpRequest(url)
+    soup = httpRequest(url, False)
 
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
@@ -141,5 +188,9 @@ def collectPage(url: str):
 #collectLocations()
 
 #collectUrls()
+
+=======
+#removeDuplicatesUrls()
+
 
 collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
