@@ -173,6 +173,6 @@ def collectPage(url: str):
 
 #collectLocations()
 
-collectUrls()
+#collectUrls()
 
 #collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
