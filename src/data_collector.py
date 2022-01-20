@@ -218,5 +218,6 @@ def collectHeadinfo(header):
 
 #removeDuplicatesUrls()
 
+#this i made
 
 collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
