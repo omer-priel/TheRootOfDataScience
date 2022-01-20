@@ -135,6 +135,10 @@ def collectUrl(locations: pd.DataFrame):
     businesses_data['Url'] = new_businesses.tolist()
     businesses_data['Category'] = np.full(len(links), categoryName)
 
+    businesses_data['SubCategories'] = businesses_data['SubCategories'].astype(object)
+    for i in businesses_data.index:
+        businesses_data.at[i, 'SubCategories'] = []
+
     df = pd.DataFrame(businesses_data)
 
     df.index += len(businesses.index)
@@ -168,6 +172,7 @@ def removeDuplicatesUrls():
     saveCSV(businesses, 'businesses')
 
 def collectPages():
+    print("Collect Pages")
     businesses = readCSV('businesses')
 
     hasNext = True
@@ -190,20 +195,22 @@ def collectPage(businesses: pd.DataFrame):
     
     collectedHead = collectHeadinfo(header)
 
-    businesses.iloc[businessID]['Name'] = collectedHead['Name']
-    businesses.iloc[businessID]['ExpensiveLevel'] = collectedHead['ExpensiveLevel']
-    businesses.iloc[businessID]['Claimed'] = collectedHead['Claimed']
-    businesses.iloc[businessID]['SubCategories'] = collectedHead['SubCategories']
-    businesses.iloc[businessID]['Stars'] = collectedHead['Stars']
-    businesses.iloc[businessID]['Reviews'] = collectedHead['Reviews']
-    businesses.iloc[businessID]['Photos'] = collectedHead['Photos']
+    businesses.at[businessID, 'Name'] = collectedHead['Name']
+    businesses.at[businessID, 'ExpensiveLevel'] = collectedHead['ExpensiveLevel']
+    businesses.at[businessID, 'Claimed'] = collectedHead['Claimed']
+    businesses.at[businessID, 'SubCategories'] = collectedHead['SubCategories']
+    businesses.at[businessID, 'Stars'] = collectedHead['Stars']
+    businesses.at[businessID, 'Reviews'] = collectedHead['Reviews']
+    businesses.at[businessID, 'Photos'] = collectedHead['Photos']
 
-    businesses.iloc[businessID]['HasWebsite'] = None
+    businesses.at[[businessID], 'HasWebsite'] = None
 
     # Set Collected to True
-    businesses.iloc[businessID]['Loaded'] = True
+    businesses.at[[businessID], 'Loaded'] = True
+
     print(businesses.iloc[businessID].to_dict())
-    #saveCSV(business, 'locations')
+
+    #saveCSV(businesses, 'businesses')
     return False #True
     
 def collectHeadinfo(header):
