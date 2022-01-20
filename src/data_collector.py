@@ -277,7 +277,6 @@ def collectHeadinfo(header):
         categories.append(category.get_text())
      
      return {
-         "Name": ' ',
          "ExpensiveLevel": expensiveLevel,
          "Stars": starRating,
          "Claimed": isClaimed,
@@ -302,9 +301,32 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         if websiteUrlElem != None:
             hasWebsite = websiteUrlElem.getText().find('http') != -1
 
-    # Get OpenHour and EndHour
+    # Get OpenHour, EndHour, CountHour
     # labels: table tr th p
     # values: table tr td ul li p
+    labels = root.select('table tr th p')
+    values = root.select('table tr td ul li p')
+
+    days = {}
+    for i in range(1, 8):
+        days['OpenHour' + str(i)] = None
+        days['EndHour' + str(i)] = None
+        days['CountHour' + str(i)] = None
+
+
+    if 0 < len(labels) and len(labels) == len(values):
+        dayNumber = 1
+        for i in [6, 0, 1, 2, 3, 4, 5]:
+            label = labels[i].getText()
+            value = values[i].getText()
+
+            if values[i].getText() == 'Closed':
+                days['OpenHour' + str(dayNumber)] = 0
+            else:
+                sp = value.getText().split(' - ')
+
+
+            dayNumber += 1
 
     return {
         'Name': name,
@@ -322,5 +344,5 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-collectPages()
+# collectPages()
 
