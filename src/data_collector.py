@@ -1,10 +1,8 @@
 # Data Collector
 
 # System
-
 import os
 import json
-
 
 # Web Scraping
 import requests
@@ -294,6 +292,35 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-collectPages()
+#collectPages()
 
-from shadow_useragent import ShadowUserAgent
+# Utilities
+def httpRequest(url: str, useSplash: bool, useZyte: bool):
+    if useSplash:
+        print(url)
+
+        url = urllib.parse.quote(url)
+        splashUrl = 'http://192.168.1.117:8050/render.html?'
+        if useZyte:
+            proxyUrl = urllib.parse.quote('http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/')
+            splashUrl = splashUrl + 'proxy=' + proxyUrl + '&'
+        url = splashUrl + 'url=' + url
+        res = requests.get(splashUrl)
+    else:
+        res = requests.get(url)
+
+    soup = BeautifulSoup(res.content, 'html.parser')
+
+def httpRequest2(url):
+    response = requests.get(
+        url,
+        proxies={
+            "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+            "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+        },
+        verify='./zyte-proxy-ca.crt'
+    )
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+    return soup
+
