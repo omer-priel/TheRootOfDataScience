@@ -191,7 +191,10 @@ def collectPage(businesses: pd.DataFrame):
 
     # Start to collect the Page
     soup = httpRequest(url, False)
-
+    if soup.getText().find('Sorry, you’re not allowed to access this page.') != -1:
+        print('Sorry, you’re not allowed to access this page.')
+        return False
+    
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
     
@@ -206,7 +209,7 @@ def collectPage(businesses: pd.DataFrame):
     businesses.at[businessID, 'Photos'] = float(collectedHead['Photos'])
 
     businesses.at[businessID, 'Name'] = collectedBody['Name']
-    businesses.at[businessID, 'HasWebsite'] = 0
+    businesses.at[businessID, 'HasWebsite'] = collectedBody['HasWebsite']
 
     # Set Collected to True
     businesses.at[businessID, 'Loaded'] = True
@@ -267,8 +270,17 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
     if nameElem != None:
         name = nameElem.getText()
 
+    # Get Has Website
+    hasWebsite = None
+    labelElem = root.find('p', string='Business website')
+    if labelElem != None:
+        websiteUrlElem = labelElem.findNext('a')
+        if websiteUrlElem != None:
+            hasWebsite = websiteUrlElem.getText().find('http') != -1
+
     return {
-        'Name': name
+        'Name': name,
+        'HasWebsite': hasWebsite
     }
 
 # Entry Point
@@ -283,3 +295,5 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
 collectPages()
+
+from shadow_useragent import ShadowUserAgent
