@@ -195,14 +195,14 @@ def collectPage(businesses: pd.DataFrame):
     
     collectedHead = collectHeadinfo(header)
 
-    businesses.at[businessID, 'Name'] = collectedHead['Name']
     businesses.at[businessID, 'ExpensiveLevel'] = collectedHead['ExpensiveLevel']
-    businesses.at[businessID, 'Claimed'] = collectedHead['Claimed']
+    businesses.at[businessID, 'Claimed'] = float(collectedHead['Claimed'])
     businesses.at[businessID, 'SubCategories'] = collectedHead['SubCategories']
-    businesses.at[businessID, 'Stars'] = collectedHead['Stars']
-    businesses.at[businessID, 'Reviews'] = collectedHead['Reviews']
-    businesses.at[businessID, 'Photos'] = collectedHead['Photos']
+    businesses.at[businessID, 'Stars'] = float(collectedHead['Stars'])
+    businesses.at[businessID, 'Reviews'] = float(collectedHead['Reviews'])
+    businesses.at[businessID, 'Photos'] = float(collectedHead['Photos'])
 
+    businesses.at[businessID, 'Name'] = collectedHead['Name']
     businesses.at[[businessID], 'HasWebsite'] = None
 
     # Set Collected to True
@@ -268,4 +268,4 @@ def collectHeadinfo(header):
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-#collectPages()
+collectPages()
