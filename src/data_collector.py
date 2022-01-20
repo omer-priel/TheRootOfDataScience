@@ -1,12 +1,15 @@
 # Data Collector
 
 # System
+
 import os
 import json
+
 
 # Web Scraping
 import requests
 from bs4 import BeautifulSoup
+import re
 
 import urllib.parse
 
@@ -164,27 +167,56 @@ def removeDuplicatesUrls():
     saveCSV(busines, 'busines')
 
 def collectPage(url: str):
-    busines = empty_busines()
-    busines['Loaded'] = False
-    busines['Url'] = url
+    business = empty_busines()
+    business['Loaded'] = False
+    business['Url'] = url
 
     soup = httpRequest(url, False)
 
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
-    footer = header.parent.findChildren("div", recursive=False)[3]
+    
+    collectedHead = collectHeadinfo(header)
+    
+    #business['ExpensiveLevel']=collectedHead["dollars"]
+    
+def collectHeadinfo(header):
+     photocount=header.find(string=re.compile('See \d+ photos'))
+     photocount=int(re.findall("\d+",photocount)[0])
+     #gets into where the fun stuff is so we wont have to search as much
+     headInfo=header.find(class_=re.compile('photo\-header\-content__.+'))
+     headInfo=headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
+     ##find $$$$ in header  
+     dollars=len(headInfo.find(string=re.compile('\$+')))
+     ##find the rating of the resturant
+     starRating= headInfo.find(class_=re.compile('.i-stars.+'))['aria-label']
+     starRating=float((re.findall("[0-5]\.?5?",starRating))[0])
+     starRating=int(starRating*2)
 
-    print(header.getText())
+     ##find the number of ratings
+     ratings=headInfo.find(text=re.compile('.+reviews'))
+     ratings=int(re.findall("\d+",ratings)[0])
 
-    print('----------------------------')
+     ##find whether a resturant is claimed
+     isClaimed=headInfo.find(text=re.compile('.+laimed'))
+     isClaimed=(isClaimed=="Claimed")
 
-    print(footer.getText())
+     #only categories have this type of link as it seems
+     categorieslinks= headInfo.findAll(href=re.compile('/c/sf.+'))
+     categories=[]
+     for category in (categorieslinks):
+        categories.append(category.get_text())
+     
+     return {"dollars":dollars,"starRating":starRating,"claimed":isClaimed,"ratings":ratings,"categories":categories,"photo count": photocount}
+
 
 # Entry Point
 
 #collectLocations()
 
 #collectUrls()
+
 #removeDuplicatesUrls()
 
-#collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
+
+collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
