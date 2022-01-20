@@ -196,7 +196,8 @@ def collectPage(businesses: pd.DataFrame):
     header = root.select_one('[data-testid="photoHeader"]')
     
     collectedHead = collectHeadinfo(header)
-
+    collectedBody = collectPageBody(root, header)
+    
     businesses.at[businessID, 'ExpensiveLevel'] = collectedHead['ExpensiveLevel']
     businesses.at[businessID, 'Claimed'] = float(collectedHead['Claimed'])
     businesses.at[businessID, 'SubCategories'] = collectedHead['SubCategories']
@@ -204,11 +205,11 @@ def collectPage(businesses: pd.DataFrame):
     businesses.at[businessID, 'Reviews'] = float(collectedHead['Reviews'])
     businesses.at[businessID, 'Photos'] = float(collectedHead['Photos'])
 
-    businesses.at[businessID, 'Name'] = collectedHead['Name']
-    businesses.at[[businessID], 'HasWebsite'] = None
+    businesses.at[businessID, 'Name'] = collectedBody['Name']
+    businesses.at[businessID, 'HasWebsite'] = 0
 
     # Set Collected to True
-    businesses.at[[businessID], 'Loaded'] = True
+    businesses.at[businessID, 'Loaded'] = True
 
     print(businesses.iloc[businessID].to_dict())
 
@@ -258,6 +259,17 @@ def collectHeadinfo(header):
          "Photos": photoCount
      }
 
+def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
+
+    # Get Name
+    name = ' '
+    nameElem = header.select_one('h1')
+    if nameElem != None:
+        name = nameElem.getText()
+
+    return {
+        'Name': name
+    }
 
 # Entry Point
 
