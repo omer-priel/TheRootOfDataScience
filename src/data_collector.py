@@ -88,7 +88,7 @@ def collectLocations():
 
 def collectUrl(locations: pd.DataFrame):
     # Get Location name
-    indexes = locations[locations['Collected'] == False].index.tolist()
+    indexes = locations[locations['Loaded'] == False].index.tolist()
     if len(indexes) == 0:
         return False
     locationID = indexes[0]
@@ -112,7 +112,7 @@ def collectUrl(locations: pd.DataFrame):
         else:
             for link in main.select('a'):
                 if link.get('href').find('/biz/') != -1:
-                    links.append(link.get('href'))
+                    links.append('https://www.yelp.com' + link.get('href'))
 
     
     print("Create Table For The Data")
@@ -166,49 +166,79 @@ def removeDuplicatesUrls():
 
     saveCSV(busines, 'busines')
 
-def collectPage(url: str):
-    #this i made
-    business = empty_busines()
-    business['Loaded'] = False
-    business['Url'] = url
+def collectPages():
+    businesses = readCSV('businesses')
 
+    hasNext = True
+    while hasNext:
+        hasNext = collectPage(businesses)
+
+def collectPage(businesses: pd.DataFrame):
+    # Get Location name
+    indexes = businesses[businesses['Loaded'] == False].index.tolist()
+    if len(indexes) == 0:
+        return False
+    businessID = indexes[0]
+    url = businesses.iloc[businessID]['Url']
+
+    # Start to collect the Page
     soup = httpRequest(url, False)
 
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
     
     collectedHead = collectHeadinfo(header)
+    print(collectedHead)
     
-    #business['ExpensiveLevel']=collectedHead["dollars"]
+    businesses.at[[businessID], 'ExpensiveLevel'] = collectedHead["expensiveLevel"]
+
+    # Set Collected to True
+    businesses.at[[businessID], 'Loaded'] = True
+    print(businesses.head())
+    #saveCSV(business, 'locations')
+    return False #True
     
 def collectHeadinfo(header):
-     photocount=header.find(string=re.compile('See \d+ photos'))
-     photocount=int(re.findall("\d+",photocount)[0])
-     #gets into where the fun stuff is so we wont have to search as much
-     headInfo=header.find(class_=re.compile('photo\-header\-content__.+'))
-     headInfo=headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
-     ##find $$$$ in header  
-     dollars=len(headInfo.find(string=re.compile('\$+')))
-     ##find the rating of the resturant
-     starRating= headInfo.find(class_=re.compile('.i-stars.+'))['aria-label']
-     starRating=float((re.findall("[0-5]\.?5?",starRating))[0])
-     starRating=int(starRating*2)
 
-     ##find the number of ratings
-     ratings=headInfo.find(text=re.compile('.+reviews'))
-     ratings=int(re.findall("\d+",ratings)[0])
+     # find "photo count" in header
+     
+     photoCount = header.find(string = re.compile('See \d+ photos'))
+     photoCount = int(re.findall("\d+",photoCount)[0])
 
-     ##find whether a resturant is claimed
-     isClaimed=headInfo.find(text=re.compile('.+laimed'))
-     isClaimed=(isClaimed=="Claimed")
+     # gets into where the fun stuff is so we wont have to search as much
+     headInfo = header.find(class_ = re.compile('photo\-header\-content__.+'))
+     headInfo = headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
 
-     #only categories have this type of link as it seems
+     # find "expensive level" in header
+     expensiveLevel = len(headInfo.find(string=re.compile('\$+')))
+
+     # find the rating of the resturant
+     starRating = headInfo.find(class_=re.compile('.i-stars.+'))['aria-label']
+     starRating = float((re.findall("[0-5]\.?5?",starRating))[0])
+     starRating = int(starRating*2)
+
+     # find the number of ratings
+     reviews = headInfo.find(text=re.compile('.+reviews'))
+     reviews = int(re.findall("\d+",reviews)[0])
+
+     # find whether a resturant is claimed
+     isClaimed = headInfo.find(text=re.compile('.+laimed'))
+     isClaimed = (isClaimed=="Claimed")
+
+     # only categories have this type of link as it seems
      categorieslinks= headInfo.findAll(href=re.compile('/c/sf.+'))
      categories=[]
      for category in (categorieslinks):
         categories.append(category.get_text())
      
-     return {"dollars":dollars,"starRating":starRating,"claimed":isClaimed,"ratings":ratings,"categories":categories,"photo count": photocount}
+     return {
+         "ExpensiveLevel": expensiveLevel,
+         "Stars": starRating,
+         "Claimed": isClaimed,
+         "Reviews": reviews,
+         "SubCategories": categories,
+         "Photos": photoCount
+     }
 
 
 # Entry Point
@@ -221,4 +251,5 @@ def collectHeadinfo(header):
 
 #this i made
 
-collectPage('https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco')
+# 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
+#collectPages()
