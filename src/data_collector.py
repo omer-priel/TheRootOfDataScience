@@ -167,6 +167,7 @@ def removeDuplicatesUrls():
     saveCSV(busines, 'busines')
 
 def collectPage(url: str):
+    #this i made
     business = empty_busines()
     business['Loaded'] = False
     business['Url'] = url
