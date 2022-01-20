@@ -121,27 +121,27 @@ def collectUrl(locations: pd.DataFrame):
     links = list(set(links))
 
     # Save Urls
-    busines = readCSV('busines')
+    businesses = readCSV('businesses')
 
-    new_busines = pd.Series(links)
+    new_businesses = pd.Series(links)
 
-    busines_data = empty_busines()
+    businesses_data = empty_busines()
 
-    for key in busines_data:
-        busines_data[key] = np.full(len(links), None)
+    for key in businesses_data:
+        businesses_data[key] = np.full(len(links), None)
 
-    busines_data['Loaded'] = np.full(len(links), False)
-    busines_data['Url'] = new_busines.tolist()
-    busines_data['Category'] = np.full(len(links), categoryName)
+    businesses_data['Loaded'] = np.full(len(links), False)
+    businesses_data['Url'] = new_businesses.tolist()
+    businesses_data['Category'] = np.full(len(links), categoryName)
 
-    df = pd.DataFrame(busines_data)
+    df = pd.DataFrame(businesses_data)
 
-    df.index += len(busines.index)
+    df.index += len(businesses.index)
 
-    busines = pd.concat([busines, df])
+    businesses = pd.concat([businesses, df])
 
-    print("Save New Busines to load")
-    saveCSV(busines, 'busines')
+    print("Save New Businesses to load")
+    saveCSV(businesses, 'businesses')
 
     # Set Collected to True
     locations.at[[locationID], 'Collected'] = True
@@ -156,15 +156,15 @@ def collectUrls():
         hasNext = collectUrl(locations)
 
 def removeDuplicatesUrls():
-    busines = readCSV('busines')
-    print('Before remove ' + str(len(busines.index)))
+    businesses = readCSV('businesses')
+    print('Before remove ' + str(len(businesses.index)))
 
-    busines.drop_duplicates(subset='Url', keep='first', inplace=True)
-    busines.index = np.arange(len(busines.index))
+    businesses.drop_duplicates(subset='Url', keep='first', inplace=True)
+    businesses.index = np.arange(len(businesses.index))
 
     print('After remove ' + str(len(busines.index)))
 
-    saveCSV(busines, 'busines')
+    saveCSV(businesses, 'businesses')
 
 def collectPages():
     businesses = readCSV('businesses')
