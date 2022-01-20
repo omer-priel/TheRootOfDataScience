@@ -31,6 +31,19 @@ def httpRequest(url: str, useSplash: bool):
 
     return soup
 
+def httpProxyRequest(url:  str):
+    response = requests.get(
+        url,
+        proxies={
+            "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+            "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+        },
+        verify='./zyte-proxy-ca.crt'
+    )
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+    return soup
+
 def readCSV(name: str, index_label='id') -> pd.DataFrame:
     return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
 
@@ -64,6 +77,7 @@ busines_template = {
 for i in range(1, 8):
     busines_template['OpenHour' + str(i)] = None
     busines_template['EndHour' + str(i)] = None
+    busines_template['CountHour' + str(i)] = None
 
 def empty_busines():
     return busines_template.copy()
@@ -167,7 +181,7 @@ def removeDuplicatesUrls():
     businesses.drop_duplicates(subset='Url', keep='first', inplace=True)
     businesses.index = np.arange(len(businesses.index))
 
-    print('After remove ' + str(len(busines.index)))
+    print('After remove ' + str(len(businesses.index)))
 
     saveCSV(businesses, 'businesses')
 
@@ -179,6 +193,11 @@ def collectPages():
     while hasNext:
         hasNext = collectPage(businesses)
 
+#TEMP
+gBusinesses = None
+gRoot = None
+gHeader = None
+
 def collectPage(businesses: pd.DataFrame):
     # Get Location name
     indexes = businesses[businesses['Loaded'] == False].index.tolist()
@@ -188,14 +207,22 @@ def collectPage(businesses: pd.DataFrame):
     url = businesses.iloc[businessID]['Url']
 
     # Start to collect the Page
-    soup = httpRequest(url, False)
+    soup = httpProxyRequest(url)
     if soup.getText().find('Sorry, you’re not allowed to access this page.') != -1:
         print('Sorry, you’re not allowed to access this page.')
         return False
     
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
-    
+
+    # TEMP
+    global gBusinesses
+    global gRoot
+    global gHeader
+    gBusinesses = businesses
+    gRoot = root
+    gHeader = header
+
     collectedHead = collectHeadinfo(header)
     collectedBody = collectPageBody(root, header)
     
@@ -220,7 +247,6 @@ def collectPage(businesses: pd.DataFrame):
 def collectHeadinfo(header):
 
      # find "photo count" in header
-     
      photoCount = header.find(string = re.compile('See \d+ photos'))
      photoCount = int(re.findall("\d+",photoCount)[0])
 
@@ -276,9 +302,13 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         if websiteUrlElem != None:
             hasWebsite = websiteUrlElem.getText().find('http') != -1
 
+    # Get OpenHour and EndHour
+    # labels: table tr th p
+    # values: table tr td ul li p
+
     return {
         'Name': name,
-        'HasWebsite': hasWebsite
+        'HasWebsite': float(hasWebsite)
     }
 
 # Entry Point
@@ -292,35 +322,5 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-#collectPages()
-
-# Utilities
-def httpRequest(url: str, useSplash: bool, useZyte: bool):
-    if useSplash:
-        print(url)
-
-        url = urllib.parse.quote(url)
-        splashUrl = 'http://192.168.1.117:8050/render.html?'
-        if useZyte:
-            proxyUrl = urllib.parse.quote('http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/')
-            splashUrl = splashUrl + 'proxy=' + proxyUrl + '&'
-        url = splashUrl + 'url=' + url
-        res = requests.get(splashUrl)
-    else:
-        res = requests.get(url)
-
-    soup = BeautifulSoup(res.content, 'html.parser')
-
-def httpRequest2(url):
-    response = requests.get(
-        url,
-        proxies={
-            "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-            "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-        },
-        verify='./zyte-proxy-ca.crt'
-    )
-
-    soup = BeautifulSoup(response.content, 'html.parser')
-    return soup
+collectPages()
 
