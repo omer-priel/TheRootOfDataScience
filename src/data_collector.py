@@ -135,8 +135,10 @@ def collectUrl(locations: pd.DataFrame):
     businesses_data['Url'] = new_businesses.tolist()
     businesses_data['Category'] = np.full(len(links), categoryName)
 
+    businesses_data['Name'] = businesses_data['Name'].astype(str)
     businesses_data['SubCategories'] = businesses_data['SubCategories'].astype(object)
     for i in businesses_data.index:
+        businesses_data.at[i, 'Name'] = ' '
         businesses_data.at[i, 'SubCategories'] = []
 
     df = pd.DataFrame(businesses_data)
@@ -247,7 +249,7 @@ def collectHeadinfo(header):
         categories.append(category.get_text())
      
      return {
-         "Name": None,
+         "Name": ' ',
          "ExpensiveLevel": expensiveLevel,
          "Stars": starRating,
          "Claimed": isClaimed,
