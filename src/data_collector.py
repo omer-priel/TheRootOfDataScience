@@ -46,6 +46,7 @@ busines_template = {
     'Loaded': None,
     "ExpensiveLevel": None,
     'Category': None,
+    'SubCategories': None,
     'Claimed': None,
     'HasWebsite': None,
     'Stars': None,
@@ -188,13 +189,20 @@ def collectPage(businesses: pd.DataFrame):
     header = root.select_one('[data-testid="photoHeader"]')
     
     collectedHead = collectHeadinfo(header)
-    print(collectedHead)
-    
-    businesses.at[[businessID], 'ExpensiveLevel'] = collectedHead["expensiveLevel"]
+
+    businesses.iloc[businessID]['Name'] = collectedHead['Name']
+    businesses.iloc[businessID]['ExpensiveLevel'] = collectedHead['ExpensiveLevel']
+    businesses.iloc[businessID]['Claimed'] = collectedHead['Claimed']
+    businesses.iloc[businessID]['SubCategories'] = collectedHead['SubCategories']
+    businesses.iloc[businessID]['Stars'] = collectedHead['Stars']
+    businesses.iloc[businessID]['Reviews'] = collectedHead['Reviews']
+    businesses.iloc[businessID]['Photos'] = collectedHead['Photos']
+
+    businesses.iloc[businessID]['HasWebsite'] = None
 
     # Set Collected to True
-    businesses.at[[businessID], 'Loaded'] = True
-    print(businesses.head())
+    businesses.iloc[businessID]['Loaded'] = True
+    print(businesses.iloc[businessID].to_dict())
     #saveCSV(business, 'locations')
     return False #True
     
@@ -232,6 +240,7 @@ def collectHeadinfo(header):
         categories.append(category.get_text())
      
      return {
+         "Name": None,
          "ExpensiveLevel": expensiveLevel,
          "Stars": starRating,
          "Claimed": isClaimed,
