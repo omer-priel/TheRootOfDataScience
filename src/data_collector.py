@@ -228,16 +228,12 @@ def collectPage(businesses: pd.DataFrame):
 
     collectedHead = collectHeadinfo(header)
     collectedBody = collectPageBody(root, header)
-    
-    businesses.at[businessID, 'ExpensiveLevel'] = collectedHead['ExpensiveLevel']
-    businesses.at[businessID, 'Claimed'] = float(collectedHead['Claimed'])
-    businesses.at[businessID, 'SubCategories'] = collectedHead['SubCategories']
-    businesses.at[businessID, 'Stars'] = float(collectedHead['Stars'])
-    businesses.at[businessID, 'Reviews'] = float(collectedHead['Reviews'])
-    businesses.at[businessID, 'Photos'] = float(collectedHead['Photos'])
 
-    businesses.at[businessID, 'Name'] = collectedBody['Name']
-    businesses.at[businessID, 'HasWebsite'] = collectedBody['HasWebsite']
+    for key in collectedHead:
+        businesses.at[businessID, key] = collectedHead[key]
+
+    for key in collectedBody:
+        businesses.at[businessID, key] = collectedBody[key]
 
     # Set Collected to True
     businesses.at[businessID, 'Loaded'] = True
@@ -280,36 +276,26 @@ def collectHeadinfo(header):
         categories.append(category.get_text())
      
      return {
-         "ExpensiveLevel": expensiveLevel,
-         "Stars": starRating,
-         "Claimed": isClaimed,
-         "Reviews": reviews,
+         "ExpensiveLevel": float(expensiveLevel),
+         "Stars": float(starRating),
+         "Claimed": float(isClaimed),
+         "Reviews": float(reviews),
          "SubCategories": categories,
-         "Photos": photoCount
+         "Photos": float(photoCount)
      }
 
 def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 
-    # Get Name
-    name = ' '
-    nameElem = header.select_one('h1')
-    if nameElem != None:
-        name = nameElem.getText()
-
-    # Get Has Website
-    hasWebsite = None
-    labelElem = root.find('p', string='Business website')
-    if labelElem != None:
-        websiteUrlElem = labelElem.findNext('a')
-        if websiteUrlElem != None:
-            hasWebsite = websiteUrlElem.getText().find('http') != -1
-
-    # Get OpenHour, EndHour, CountHour
-    # labels: table tr th p
-    # values: table tr td ul li p
     data = {
-        'Name': name,
-        'HasWebsite': float(hasWebsite),
+        'Name': ' ',
+        'HasWebsite': None,
+        'MenuCount': None,
+        'MenuStartsCount': None,
+        'MenuReviewsCount': None,
+        'MenuPhotosCount': None,
+        'Attributes Has': None,
+        'AttributesCount': None,
+        'QuestionsCount': None
     }
 
     for i in range(1, 8):
@@ -317,6 +303,19 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         data['EndHour' + str(i)] = None
         data['CountHour' + str(i)] = None
 
+    # Get Name
+    nameElem = header.select_one('h1')
+    if nameElem != None:
+        data['Name'] = nameElem.getText()
+
+    # Get Has Website
+    labelElem = root.find('p', string='Business website')
+    if labelElem != None:
+        websiteUrlElem = labelElem.findNext('a')
+        if websiteUrlElem != None:
+            data['HasWebsite'] = float(websiteUrlElem.getText().find('http') != -1)
+
+    # Get OpenHour, EndHour, CountHour
     try:
         labels = root.select('table tr th p')
         values = root.select('table tr td ul li p')
