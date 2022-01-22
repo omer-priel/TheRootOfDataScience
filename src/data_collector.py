@@ -274,6 +274,7 @@ def collectHeadinfo(header):
      categories=[]
      for category in (categorieslinks):
         categories.append(category.get_text())
+    # TODO: has bug - https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco
      
      return {
          "ExpensiveLevel": float(expensiveLevel),
