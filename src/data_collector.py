@@ -23,23 +23,26 @@ def httpRequest(url: str, useSplash: bool):
         print(url)
         url = urllib.parse.quote(url)
         url = 'http://192.168.1.117:8050/render.html?url=' + url
-        res = requests.get(url)
+        response = requests.get(url)
     else:
-        res = requests.get(url)
+        response = requests.get(url)
 
-    soup = BeautifulSoup(res.content, 'html.parser')
+    soup = BeautifulSoup(response.content, 'html.parser')
 
     return soup
 
-def httpProxyRequest(url:  str):
-    response = requests.get(
-        url,
-        proxies={
-            "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-            "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-        },
-        verify='./zyte-proxy-ca.crt'
-    )
+def httpProxyRequest(url:  str, useProxy: bool):
+    if useProxy:
+        response = requests.get(
+            url,
+            proxies={
+                "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+                "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+            },
+            verify='./zyte-proxy-ca.crt'
+        )
+    else:
+        response = requests.get(url)
 
     soup = BeautifulSoup(response.content, 'html.parser')
     return soup
@@ -207,7 +210,7 @@ def collectPage(businesses: pd.DataFrame):
     url = businesses.iloc[businessID]['Url']
 
     # Start to collect the Page
-    soup = httpProxyRequest(url)
+    soup = httpProxyRequest(url, False)
     if soup.getText().find('Sorry, you’re not allowed to access this page.') != -1:
         print('Sorry, you’re not allowed to access this page.')
         return False
@@ -304,34 +307,56 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
     # Get OpenHour, EndHour, CountHour
     # labels: table tr th p
     # values: table tr td ul li p
-    labels = root.select('table tr th p')
-    values = root.select('table tr td ul li p')
-
-    days = {}
-    for i in range(1, 8):
-        days['OpenHour' + str(i)] = None
-        days['EndHour' + str(i)] = None
-        days['CountHour' + str(i)] = None
-
-
-    if 0 < len(labels) and len(labels) == len(values):
-        dayNumber = 1
-        for i in [6, 0, 1, 2, 3, 4, 5]:
-            label = labels[i].getText()
-            value = values[i].getText()
-
-            if values[i].getText() == 'Closed':
-                days['OpenHour' + str(dayNumber)] = 0
-            else:
-                sp = value.getText().split(' - ')
-
-
-            dayNumber += 1
-
-    return {
+    data = {
         'Name': name,
-        'HasWebsite': float(hasWebsite)
+        'HasWebsite': float(hasWebsite),
     }
+
+    for i in range(1, 8):
+        data['OpenHour' + str(i)] = None
+        data['EndHour' + str(i)] = None
+        data['CountHour' + str(i)] = None
+
+    try:
+        labels = root.select('table tr th p')
+        values = root.select('table tr td ul li p')
+
+        if 0 < len(labels) and len(labels) == len(values):
+            dayNumber = 1
+            for i in [6, 0, 1, 2, 3, 4, 5]:
+                try:
+                    value = values[i].getText()
+
+                    if values[i].getText() == 'Closed':
+                        data['CountHour' + str(dayNumber)] = 0
+                    else:
+                        sp = value.split(' - ')
+                        openHour = timeToNumber(sp[1])
+                        endHour = timeToNumber(sp[0])
+
+                        data['OpenHour' + str(dayNumber)] = openHour
+                        data['EndHour' + str(dayNumber)] = endHour
+                        data['CountHour' + str(dayNumber)] = endHour - openHour
+                except:
+                    pass
+                dayNumber += 1
+    except:
+        pass
+    return data
+
+def timeToNumber(ts: str):
+    ret = 0
+    if ts.find('AM') != -1:
+        ret = 24
+    sp = ts.split(' ')[0].split(':')
+
+    if float(sp[1]) >= 30:
+        ret += 1
+
+    ret += float(sp[0]) * 2
+    return ret
+
+
 
 # Entry Point
 
