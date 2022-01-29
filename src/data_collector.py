@@ -217,7 +217,7 @@ def collectPage(businesses: pd.DataFrame):
 
     # Start to collect the Page
     soup = httpProxyRequest(url, True)
-    if soup.getText().find('Sorry, you’re not allowed to access this page.') != -1:
+    if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
         print('Sorry, you’re not allowed to access this page.')
         return False
     
@@ -296,11 +296,11 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         'Name': ' ',
         'HasWebsite': None,
         'MenuCount': None,
-        'MenuStartsCount': None,
-        'MenuReviewsCount': None,
-        'MenuPhotosCount': None,
+        'MenuStartsCount': None,  # Removed
+        'MenuReviewsCount': None, # Removed
+        'MenuPhotosCount': None,  # Removed
         'Attributes Has': None,
-        'AttributesCount': None,
+        'AttributesCount': None,  # Removed
         'QuestionsCount': None
     }
 
@@ -311,16 +311,22 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         data['HasBreak' + str(i)] = None
 
     # Get Name
-    nameElem = header.select_one('h1')
-    if nameElem != None:
-        data['Name'] = nameElem.getText()
+    try:
+        nameElem = header.select_one('h1')
+        if nameElem != None:
+            data['Name'] = nameElem.getText()
+    except:
+        pass
 
     # Get Has Website
-    labelElem = root.find('p', string='Business website')
-    if labelElem != None:
-        websiteUrlElem = labelElem.findNext('a')
-        if websiteUrlElem != None:
-            data['HasWebsite'] = float(websiteUrlElem.getText().find('http') != -1)
+    try:
+        labelElem = root.find('p', string='Business website')
+        if labelElem != None:
+            websiteUrlElem = labelElem.findNext('a')
+            if websiteUrlElem != None:
+                data['HasWebsite'] = float(websiteUrlElem.getText().find('http') != -1)
+    except:
+        pass
 
     # Get OpenHour, EndHour, CountHour
     try:
@@ -365,6 +371,31 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
                 dayNumber += 1
     except:
         pass
+
+    # Get Attributes
+    try:
+        attributesPanel = root.select('section[aria-label="Amenities and More"] > div')[1]
+        attributesSubPanel = attributesPanel.findChild('div').findChild('div').findChild('div')
+        attributes = []
+        for elem in attributesSubPanel.select('div span'):
+            if elem.select_one('svg') == None and elem.getText() != "":
+                attributes.append(elem.getText())
+
+        print(attributes)
+
+    except:
+        pass
+
+    # Get QuestionsCount
+    try:
+        label = root.select_one('h4:contains(\"Frequently Asked Questions about \")')
+        questionsParent = label.parent.parent.parent
+        questionsCount = len(questionsParent.select('p[data-font-weight="bold"]'))
+        data['QuestionsCount'] = float(questionsCount)
+
+    except:
+        pass
+
     return data
 
 def timeToNumber(ts: str):
