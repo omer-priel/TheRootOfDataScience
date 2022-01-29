@@ -325,26 +325,41 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
     # Get OpenHour, EndHour, CountHour
     try:
         labels = root.select('table tr th p')
-        values = root.select('table tr td ul li p')
 
-        if (0 < len(labels)) and (len(labels) == len(values)):
+        if len(labels) == 7:
             dayNumber = 1
             for i in [6, 0, 1, 2, 3, 4, 5]:
                 try:
-                    value = values[i].getText()
+                    valueCell = labels[i].parent.parent.select_one('td')
+                    if valueCell != None:
+                        values = valueCell.select('li')
+                        if len(values) > 0:
+                            if values[0].getText() == 'Closed':
+                                data['CountHour' + str(dayNumber)] = 0
+                                data['HasBreak'  + str(dayNumber)] = float(0)
+                            else:
+                                data['HasBreak'  + str(dayNumber)] = float(len(values) - 1)
 
-                    if values[i].getText() == 'Closed':
-                        data['CountHour' + str(dayNumber)] = 0
-                        data['HasBreak'  + str(dayNumber)] = float(0)
-                    else:
-                        sp = value.split(' - ')
-                        openHour = timeToNumber(sp[1])
-                        endHour = timeToNumber(sp[0])
+                                countHour = 0
+                                firstOpenHour = None
+                                lastEndHour = None
 
-                        data['OpenHour'  + str(dayNumber)] = openHour
-                        data['EndHour'   + str(dayNumber)] = endHour
-                        data['CountHour' + str(dayNumber)] = endHour - openHour
-                        data['HasBreak'  + str(dayNumber)] = float(0)
+                                for j in range(len(values)):
+                                    sp = values[j].getText().split(' - ')
+                                    openHour = timeToNumber(sp[0])
+                                    endHour = timeToNumber(sp[1])
+                                    if values[j].getText().find('Next day') != -1:
+                                        endHour = 48
+
+                                    if j == 0:
+                                        firstOpenHour = openHour
+                                    lastEndHour = endHour
+
+                                    countHour += endHour - openHour
+
+                                data['OpenHour' + str(dayNumber)] = firstOpenHour
+                                data['EndHour' + str(dayNumber)] = lastEndHour
+                                data['CountHour' + str(dayNumber)] = countHour
                 except:
                     pass
                 dayNumber += 1
@@ -354,7 +369,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 
 def timeToNumber(ts: str):
     ret = 0
-    if ts.find('AM') != -1:
+    if ts.find('PM') != -1:
         ret = 24
     sp = ts.split(' ')[0].split(':')
 

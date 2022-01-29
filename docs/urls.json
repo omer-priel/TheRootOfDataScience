@@ -15,6 +15,9 @@
     "examples": [
         "https://www.yelp.com/biz/lily-san-francisco?osq=Restaurants",
         "https://www.yelp.com/biz/dumpling-park-san-francisco-7",
-        "https://www.yelp.com/biz/merchant-roots-san-francisco?osq=Restaurants"
+        "https://www.yelp.com/biz/merchant-roots-san-francisco?osq=Restaurants",
+        "https://www.yelp.com/biz/gauchos-argentinian-restaurant-adelaide?osq=reservations",
+        "https://www.yelp.com/biz/little-nnq-adelaide?osq=Restaurants",
+        "https://www.yelp.com/biz/seans-kitchen-adelaide?osq=reservations"
     ]
 }
