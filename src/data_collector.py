@@ -74,13 +74,17 @@ busines_template = {
 
     'Attributes Has': None,
     'AttributesCount': None,
-    'QuestionsCount': None
+    'QuestionsCount': None,
+
+    'OpenDaysCount': None,
+    'HasBreaks': None
 }
 
 for i in range(1, 8):
     busines_template['OpenHour' + str(i)] = None
     busines_template['EndHour' + str(i)] = None
     busines_template['CountHour' + str(i)] = None
+    busines_template['HasBreaks' + str(i)] = None
 
 def empty_busines():
     return busines_template.copy()
@@ -295,13 +299,16 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         'MenuPhotosCount': None,
         'Attributes Has': None,
         'AttributesCount': None,
-        'QuestionsCount': None
+        'QuestionsCount': None,
+        'OpenDaysCount': None,
+        'HasBreaks': None
     }
 
     for i in range(1, 8):
         data['OpenHour' + str(i)] = None
         data['EndHour' + str(i)] = None
         data['CountHour' + str(i)] = None
+        data['HasBreak' + str(i)] = None
 
     # Get Name
     nameElem = header.select_one('h1')
