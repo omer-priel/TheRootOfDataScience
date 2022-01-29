@@ -156,9 +156,11 @@ def collectUrl(locations: pd.DataFrame):
 
     businesses_data['Name'] = businesses_data['Name'].astype(str)
     businesses_data['SubCategories'] = businesses_data['SubCategories'].astype(object)
+    businesses_data['Attributes Has'] = businesses_data['Attributes Has'].astype(object)
     for i in businesses_data.index:
         businesses_data.at[i, 'Name'] = ' '
         businesses_data.at[i, 'SubCategories'] = []
+        businesses_data.at[i, 'Attributes Has'] = []
 
     df = pd.DataFrame(businesses_data)
 
@@ -299,9 +301,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         'MenuPhotosCount': None,
         'Attributes Has': None,
         'AttributesCount': None,
-        'QuestionsCount': None,
-        'OpenDaysCount': None,
-        'HasBreaks': None
+        'QuestionsCount': None
     }
 
     for i in range(1, 8):
@@ -327,7 +327,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         labels = root.select('table tr th p')
         values = root.select('table tr td ul li p')
 
-        if 0 < len(labels) and len(labels) == len(values):
+        if (0 < len(labels)) and (len(labels) == len(values)):
             dayNumber = 1
             for i in [6, 0, 1, 2, 3, 4, 5]:
                 try:
@@ -335,14 +335,16 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 
                     if values[i].getText() == 'Closed':
                         data['CountHour' + str(dayNumber)] = 0
+                        data['HasBreak'  + str(dayNumber)] = float(0)
                     else:
                         sp = value.split(' - ')
                         openHour = timeToNumber(sp[1])
                         endHour = timeToNumber(sp[0])
 
-                        data['OpenHour' + str(dayNumber)] = openHour
-                        data['EndHour' + str(dayNumber)] = endHour
+                        data['OpenHour'  + str(dayNumber)] = openHour
+                        data['EndHour'   + str(dayNumber)] = endHour
                         data['CountHour' + str(dayNumber)] = endHour - openHour
+                        data['HasBreak'  + str(dayNumber)] = float(0)
                 except:
                     pass
                 dayNumber += 1
