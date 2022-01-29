@@ -210,7 +210,7 @@ def collectPage(businesses: pd.DataFrame):
     url = businesses.iloc[businessID]['Url']
 
     # Start to collect the Page
-    soup = httpProxyRequest(url, False)
+    soup = httpProxyRequest(url, True)
     if soup.getText().find('Sorry, you’re not allowed to access this page.') != -1:
         print('Sorry, you’re not allowed to access this page.')
         return False
@@ -270,12 +270,11 @@ def collectHeadinfo(header):
      isClaimed = (isClaimed=="Claimed")
 
      # only categories have this type of link as it seems
-     categorieslinks= headInfo.findAll(href=re.compile('/c/sf.+'))
+     categorieslinks= headInfo.findAll(href=re.compile('/c/.+'))
      categories=[]
      for category in (categorieslinks):
         categories.append(category.get_text())
-    # TODO: has bug - https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco
-     
+
      return {
          "ExpensiveLevel": float(expensiveLevel),
          "Stars": float(starRating),
