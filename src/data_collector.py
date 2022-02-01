@@ -31,16 +31,38 @@ def httpRequest(url: str, useSplash: bool):
 
     return soup
 
-def httpProxyRequest(url:  str, useProxy: bool):
+def httpProxyRequest(url:  str, useProxy: bool, useSplsh: bool, script: str):
     if useProxy:
-        response = requests.get(
-            url,
-            proxies={
-                "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-                "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-            },
-            verify='./zyte-proxy-ca.crt'
-        )
+        if useSplsh:
+            splshHost = 'https://2tgcg9vk-splash.scrapinghub.com'
+            splshUsername = 'e9e31311d4144b92b99618c0b3f7a0ab'
+
+            #url = urllib.parse.quote(url)
+            fullUrl = splshHost + '/render.html'
+            if str == None:
+                script = """
+                splash:go(args.url)
+                return splash:html()
+                """
+
+            response = requests.get(
+                fullUrl,
+                auth=(splshUsername, ''),
+                params={
+                    'url': url,
+                    'lua_source': script
+                }
+            )
+        else:
+            response = requests.get(
+                url,
+                proxies={
+                    "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+                    "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+                },
+                verify='./zyte-proxy-ca.crt'
+
+            )
     else:
         response = requests.get(url)
 
@@ -216,7 +238,10 @@ def collectPage(businesses: pd.DataFrame):
     url = businesses.iloc[businessID]['Url']
 
     # Start to collect the Page
-    soup = httpProxyRequest(url, True)
+    # btn = document.querySelector('yelp-react-root div section[aria-label="Amenities and More"] button[type="submit"]')
+    # document.body.innerHTML=''
+    soup = httpProxyRequest(url, True, True, None)
+
     if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
         print('Sorry, you’re not allowed to access this page.')
         return False
@@ -388,7 +413,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 
     # Get QuestionsCount
     try:
-        label = root.select_one('h4:contains(\"Frequently Asked Questions about \")')
+        label = root.select_one('h4:-soup-contains(\"Frequently Asked Questions about \")')
         questionsParent = label.parent.parent.parent
         questionsCount = len(questionsParent.select('p[data-font-weight="bold"]'))
         data['QuestionsCount'] = float(questionsCount)
