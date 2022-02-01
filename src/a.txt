@@ -1,0 +1,4 @@
+res = httpProxyRequest(url)
+command = res['command']
+soup = res['soup']
+len(soup.body.select('yelp-react-root div section[aria-label=\"Amenities and More\"] span'))

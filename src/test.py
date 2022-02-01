@@ -21,18 +21,10 @@ def httpProxyRequest(url:  str):
 
     fullUrl = splshHost + '/execute'
 
-    script = """
-        function main(splash)
-          local url = splash.args.url
-          assert(splash:go(url))
-          assert(splash:wait(0.5))
-          splash:runjs("document.title='';")
-          assert(splash:wait(3))
-          local title = splash:evaljs("document.title")
-          
-          return splash:html()
-        end
-        """
+    f = open("./lua/splash_script.lua", "r")
+    script = f.read()
+    f.close()
+    print(script)
     response = requests.get(
         fullUrl,
         auth=(splshUsername, ''),
@@ -41,11 +33,16 @@ def httpProxyRequest(url:  str):
             'lua_source': script
             }
         )
+    print(response.content)
+    soup = json.loads(response.content)
 
-    soup = BeautifulSoup(response.content, 'html.parser')
     return soup
 
 url = 'https://www.yelp.com/biz/little-nnq-adelaide?osq=Restaurants'
 
-#res = httpProxyRequest(url)
-#print(res)
+res = httpProxyRequest(url)
+command = res.get('command')
+soup = res.get('html')
+#soup = BeautifulSoup(soup, 'html.parser'),
+elements = res.get('elements')
+#print(len(soup.body.select('yelp-react-root div section[aria-label=\"Amenities and More\"] span')))
