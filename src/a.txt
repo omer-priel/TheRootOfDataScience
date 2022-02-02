@@ -1,7 +1,0 @@
-res = httpProxyRequest(url)
-command = res['command']
-soup = res['soup']
-len(soup.body.select('yelp-react-root div section[aria-label=\"Amenities and More\"] span'))
-
-url = 'https://www.yelp.com/biz/little-nnq-adelaide?osq=Restaurants'
-soup = httpSeleniumRequest(url)

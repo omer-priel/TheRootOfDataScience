@@ -274,8 +274,10 @@ def collectPage(businesses: pd.DataFrame):
 def collectHeadinfo(header):
 
      # find "photo count" in header
-     photoCount = header.find(string = re.compile('See \d+ photos'))
-     photoCount = int(re.findall("\d+",photoCount)[0])
+     photoCount = 0
+     if header.find(string = re.compile('Add photo or video')) == None:
+        photoCount = header.find(string = re.compile('See \d+ photos'))
+        photoCount = int(re.findall("\d+",photoCount)[0])
 
      # gets into where the fun stuff is so we wont have to search as much
      headInfo = header.find(class_ = re.compile('photo\-header\-content__.+'))
@@ -293,7 +295,7 @@ def collectHeadinfo(header):
      starRating = int(starRating*2)
 
      # find the number of ratings
-     reviews = headInfo.find(text=re.compile('.+reviews'))
+     reviews = headInfo.find(text=re.compile('.+review'))
      reviews = int(re.findall("\d+",reviews)[0])
 
      # find whether a resturant is claimed
@@ -377,12 +379,10 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 
                                 for j in range(len(values)):
                                     sp = values[j].getText().split(' - ')
-                                    openHour = timeToNumber(sp[0])
-                                    endHour = timeToNumber(sp[1])
-                                    if values[j].getText().find('Next day') != -1:
-                                        endHour = 48
+                                    openHour = timeToNumber(sp[0], True)
+                                    endHour = timeToNumber(sp[1], False)
 
-                                    if j == 0:
+                                    if firstOpenHour == None:
                                         firstOpenHour = openHour
                                     lastEndHour = endHour
 
@@ -424,19 +424,87 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
 
     return data
 
-def timeToNumber(ts: str):
-    ret = 0
-    if ts.find('PM') != -1:
-        ret = 24
-    sp = ts.split(' ')[0].split(':')
+time_open_select = [
+    '12:00 AM', '12:30 AM',
+    '1:00 AM', '1:30 AM',
+    '2:00 AM', '2:30 AM',
+    '3:00 AM', '3:30 AM',
+    '4:00 AM', '4:30 AM',
+    '5:00 AM', '5:30 AM',
+    '6:00 AM', '6:30 AM',
+    '7:00 AM', '7:30 AM',
+    '8:00 AM', '8:30 AM',
+    '9:00 AM', '9:30 AM',
+    '10:00 AM', '10:30 AM',
+    '11:00 AM', '11:30 AM',
+    '12:00 PM', '12:30 PM',
+    '1:00 PM', '1:30 PM',
+    '2:00 PM', '2:30 PM',
+    '3:00 PM', '3:30 PM',
+    '4:00 PM', '4:30 PM',
+    '5:00 PM', '5:30 PM',
+    '6:00 PM', '6:30 PM',
+    '7:00 PM', '7:30 PM',
+    '8:00 PM', '8:30 PM',
+    '9:00 PM', '9:30 PM',
+    '10:00 PM', '10:30 PM',
+    '11:00 PM', '11:30 PM',
+]
 
-    if float(sp[1]) >= 30:
-        ret += 1
+time_end_select = [
+    '12:00 AM', '12:30 AM',
+    '1:00 AM', '1:30 AM',
+    '2:00 AM', '2:30 AM',
+    '3:00 AM', '3:30 AM',
+    '4:00 AM', '4:30 AM',
+    '5:00 AM', '5:30 AM',
+    '6:00 AM', '6:30 AM',
+    '7:00 AM', '7:30 AM',
+    '8:00 AM', '8:30 AM',
+    '9:00 AM', '9:30 AM',
+    '10:00 AM', '10:30 AM',
+    '11:00 AM', '11:30 AM',
+    '12:00 PM', '12:30 PM',
+    '1:00 PM', '1:30 PM',
+    '2:00 PM', '2:30 PM',
+    '3:00 PM', '3:30 PM',
+    '4:00 PM', '4:30 PM',
+    '5:00 PM', '5:30 PM',
+    '6:00 PM', '6:30 PM',
+    '7:00 PM', '7:30 PM',
+    '8:00 PM', '8:30 PM',
+    '9:00 PM', '9:30 PM',
+    '10:00 PM', '10:30 PM',
+    '11:00 PM', '11:30 PM',
+    '12:00 AM (Next day)', '12:30 AM (Next day)',
+    '1:00 AM (Next day)', '1:30 AM (Next day)',
+    '2:00 AM (Next day)', '2:30 AM (Next day)',
+    '3:00 AM (Next day)', '3:30 AM (Next day)',
+    '4:00 AM (Next day)', '4:30 AM (Next day)',
+    '5:00 AM (Next day)', '5:30 AM (Next day)',
+    '6:00 AM (Next day)', '6:30 AM (Next day)',
+]
 
-    ret += float(sp[0]) * 2
-    return ret
+def timeToNumber(ts: str, is_first: bool):
 
+    global time_open_select
+    global time_end_select
 
+    if is_first:
+        return time_open_select.index(ts)
+    else:
+        return time_end_select.index(ts)
+
+# Tests
+def firstUnloadUrl():
+    businesses = readCSV('businesses')
+    indexes = businesses[businesses['Loaded'] == False].index.tolist()
+    print(len(indexes))
+    if len(indexes) == 0:
+        return None
+    businessID = indexes[0]
+    url = businesses.iloc[businessID]['Url']
+    return url
 
 # Entry Point
 
@@ -449,5 +517,5 @@ def timeToNumber(ts: str):
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-collectPages()
+#collectPages()
 
