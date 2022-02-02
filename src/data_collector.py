@@ -28,7 +28,7 @@ driver_options = {
     }
 }
 
-driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=driver_options)
+#driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=driver_options)
 
 # Utilities Requests
 def httpRequest(url: str, useSplash: bool):
@@ -44,34 +44,31 @@ def httpRequest(url: str, useSplash: bool):
 
     return soup
 
-def httpProxyRequest(url:  str, useProxy: bool, useSplsh: bool):
-    if useProxy:
-        if useSplsh:
-            splshHost = 'https://2tgcg9vk-splash.scrapinghub.com'
-            splshUsername = 'e9e31311d4144b92b99618c0b3f7a0ab'
+def httpProxyRequest(url:  str, useSplsh: bool):
+    if useSplsh:
+        splshHost = 'https://2tgcg9vk-splash.scrapinghub.com'
+        splshUsername = 'e9e31311d4144b92b99618c0b3f7a0ab'
 
-            fullUrl = splshHost + '/render.html'
+        fullUrl = splshHost + '/render.html'
 
-            response = requests.get(
-                fullUrl,
-                auth=(splshUsername, ''),
-                params={
-                    'url': url
-                }
-            )
-        else:
-            response = requests.get(
-                url,
-                proxies={
-                    "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-                    "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-                },
-                verify='./zyte-proxy-ca.crt'
-
-            )
+        response = requests.get(
+            fullUrl,
+            auth=(splshUsername, ''),
+            params={
+                'url': url
+            }
+        )
     else:
-        response = requests.get(url)
+        response = requests.get(
+            url,
+            proxies={
+                "http": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+                "https": "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+            },
+            verify='./zyte-proxy-ca.crt'
 
+        )
+        
     soup = BeautifulSoup(response.content, 'html.parser')
     return soup
 
@@ -247,14 +244,14 @@ def collectPage(businesses: pd.DataFrame):
     url = businesses.iloc[businessID]['Url']
 
     # Start to collect the Page
-    soup = httpSeleniumRequest(url)
+    soup = httpProxyRequest(url, False)
 
     if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
         print('Sorry, you’re not allowed to access this page.')
         return False
 
-    driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
-    soup = BeautifulSoup(driver.page_source, 'html.parser')
+    #driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
+    #soup = BeautifulSoup(driver.page_source, 'html.parser')
 
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
@@ -285,7 +282,10 @@ def collectHeadinfo(header):
      headInfo = headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
 
      # find "expensive level" in header
-     expensiveLevel = len(headInfo.find(string=re.compile('\$+')))
+     elms = headInfo.find(string=re.compile('\$+'))
+     expensiveLevel = 0
+     if elms != None:
+         expensiveLevel = len(elms)
 
      # find the rating of the resturant
      starRating = headInfo.find(class_=re.compile('.i-stars.+'))['aria-label']
@@ -325,7 +325,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
         'MenuReviewsCount': None, # Removed
         'MenuPhotosCount': None,  # Removed
         'Attributes Has': None,
-        'AttributesCount': None,  # Removed
+        'AttributesCount': None,
         'QuestionsCount': None
     }
 
@@ -407,6 +407,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
                 attributes.append(elem.getText())
 
         data['Attributes Has'] = attributes
+        data['AttributesCount'] = len(attributes)
 
     except:
         pass
@@ -448,5 +449,5 @@ def timeToNumber(ts: str):
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-collectPages()
+#collectPages()
 
