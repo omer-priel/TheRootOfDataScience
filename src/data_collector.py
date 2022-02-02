@@ -256,8 +256,13 @@ def collectPage(businesses: pd.DataFrame):
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
 
-    collectedHead = collectHeadinfo(header)
-    collectedBody = collectPageBody(root, header)
+    isPhotoHeader = True
+    if header == None:
+        isPhotoHeader = False
+        header = root.find('h1').parent.parent.parent.parent
+
+    collectedHead = collectHeadinfo(header, isPhotoHeader)
+    collectedBody = collectPageBody(root, header, isPhotoHeader)
 
     for key in collectedHead:
         businesses.at[businessID, key] = collectedHead[key]
@@ -271,16 +276,18 @@ def collectPage(businesses: pd.DataFrame):
     saveCSV(businesses, 'businesses')
     return True
     
-def collectHeadinfo(header):
+def collectHeadinfo(header, isPhotoHeader):
 
      # find "photo count" in header
      photoCount = 0
-     if header.find(string = re.compile('Add photo or video')) == None:
+     if isPhotoHeader and header.find(string = re.compile('Add photo or video')) == None:
         photoCount = header.find(string = re.compile('See \d+ photos'))
         photoCount = int(re.findall("\d+",photoCount)[0])
 
      # gets into where the fun stuff is so we wont have to search as much
-     headInfo = header.find(class_ = re.compile('photo\-header\-content__.+'))
+     headInfo = header
+     if isPhotoHeader:
+        headInfo = header.find(class_ = re.compile('photo\-header\-content__.+'))
      headInfo = headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
 
      # find "expensive level" in header
@@ -317,7 +324,7 @@ def collectHeadinfo(header):
          "Photos": float(photoCount)
      }
 
-def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
+def collectPageBody(root :BeautifulSoup, header :BeautifulSoup, isPhotoHeader):
 
     data = {
         'Name': ' ',
@@ -517,5 +524,5 @@ def firstUnloadUrl():
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-collectPages()
+#collectPages()
 
