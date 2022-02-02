@@ -3,12 +3,12 @@
 # System
 import os
 import json
+import time
 
 # Web Scraping
 import requests
-import selenium
-import selenium.webdriver
-import selenium.webdriver.chrome
+import seleniumwire
+import seleniumwire.webdriver
 from bs4 import BeautifulSoup
 import re
 
@@ -19,18 +19,6 @@ import numpy as np
 import pandas as pd
 
 DRIVER_PATH = 'C:\\Projects\\Python\\TheRootOfDataScience\\bin\\chromedriver_win32\\chromedriver.exe'
-PROXY_HOST = 'proxy.crawlera.com:8011'
-PROXY_AUTH = '771c716e95864cda990b52bac3f61b8d:'
-CRT_PATH = 'C:\\Projects\\Python\\TheRootOfDataScience\\src\\zyte-proxy-ca.crt'
-
-#chrome_service = selenium.webdriver.chrome.service.Service(DRIVER_PATH)
-
-#chrome_options = selenium.webdriver.ChromeOptions()
-#chrome_options.add_argument('-proxy-server=%s' % PROXY_HOST)
-#chrome_options.add_argument('-proxy-type=https')
-#chrome_options.add_argument('–proxy-auth=%s' % PROXY_AUTH)
-#chrome_options.add_argument('–ssl-client-certificate-file=%s' % CRT_PATH)
-#chrome_options.add_argument('ignore-certificate-errors')
 
 options = {
     'proxy': {
@@ -40,11 +28,13 @@ options = {
     }
 }
 
-#browser = selenium.webdriver.Chrome(DRIVER_PATH)
-#browser.get("https://www.google.com/")
+driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=options)
 
-#browser = selenium.webdriver.Chrome(service=chrome_service, options=chrome_options)
+print('get')
 
-#browser.maximize_window()
+def httpReqest(url):
+    driver.get(url)
+    return BeautifulSoup( driver.page_source, 'html.parser')
 
-#browser.get('https://www.google.com')
+driver.get('https://www.yelp.com')
+

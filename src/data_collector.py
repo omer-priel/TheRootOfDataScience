@@ -6,6 +6,8 @@ import json
 
 # Web Scraping
 import requests
+import seleniumwire
+import seleniumwire.webdriver
 from bs4 import BeautifulSoup
 import re
 
@@ -15,9 +17,20 @@ import urllib.parse
 import numpy as np
 import pandas as pd
 
-# user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36
+# Load selenium driver
+DRIVER_PATH = 'C:\\Projects\\Python\\TheRootOfDataScience\\bin\\chromedriver_win32\\chromedriver.exe'
 
-# Utilities
+driver_options = {
+    'proxy': {
+        'http': "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+        'https': "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+        'no_proxy': "localhost,127.0.0.1",
+    }
+}
+
+driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=driver_options)
+
+# Utilities Requests
 def httpRequest(url: str, useSplash: bool):
     if useSplash:
         print(url)
@@ -31,26 +44,19 @@ def httpRequest(url: str, useSplash: bool):
 
     return soup
 
-def httpProxyRequest(url:  str, useProxy: bool, useSplsh: bool, script: str):
+def httpProxyRequest(url:  str, useProxy: bool, useSplsh: bool):
     if useProxy:
         if useSplsh:
             splshHost = 'https://2tgcg9vk-splash.scrapinghub.com'
             splshUsername = 'e9e31311d4144b92b99618c0b3f7a0ab'
 
-            #url = urllib.parse.quote(url)
             fullUrl = splshHost + '/render.html'
-            if str == None:
-                script = """
-                splash:go(args.url)
-                return splash:html()
-                """
 
             response = requests.get(
                 fullUrl,
                 auth=(splshUsername, ''),
                 params={
-                    'url': url,
-                    'lua_source': script
+                    'url': url
                 }
             )
         else:
@@ -69,6 +75,13 @@ def httpProxyRequest(url:  str, useProxy: bool, useSplsh: bool, script: str):
     soup = BeautifulSoup(response.content, 'html.parser')
     return soup
 
+def httpSeleniumRequest(url: str):
+    global driver
+
+    driver.get(url)
+    return BeautifulSoup(driver.page_source, 'html.parser')
+
+# Utilities Files
 def readCSV(name: str, index_label='id') -> pd.DataFrame:
     return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
 
@@ -224,38 +237,27 @@ def collectPages():
     while hasNext:
         hasNext = collectPage(businesses)
 
-#TEMP
-gBusinesses = None
-gRoot = None
-gHeader = None
-
 def collectPage(businesses: pd.DataFrame):
     # Get Location name
     indexes = businesses[businesses['Loaded'] == False].index.tolist()
+    print(len(indexes))
     if len(indexes) == 0:
         return False
     businessID = indexes[0]
     url = businesses.iloc[businessID]['Url']
 
     # Start to collect the Page
-    # btn = document.querySelector('yelp-react-root div section[aria-label="Amenities and More"] button[type="submit"]')
-    # document.body.innerHTML=''
-    soup = httpProxyRequest(url, True, True, None)
+    soup = httpSeleniumRequest(url)
 
     if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
         print('Sorry, you’re not allowed to access this page.')
         return False
-    
+
+    driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
+
     root = soup.select_one('yelp-react-root div')
     header = root.select_one('[data-testid="photoHeader"]')
-
-    # TEMP
-    global gBusinesses
-    global gRoot
-    global gHeader
-    gBusinesses = businesses
-    gRoot = root
-    gHeader = header
 
     collectedHead = collectHeadinfo(header)
     collectedBody = collectPageBody(root, header)
@@ -269,10 +271,8 @@ def collectPage(businesses: pd.DataFrame):
     # Set Collected to True
     businesses.at[businessID, 'Loaded'] = True
 
-    print(businesses.iloc[businessID].to_dict())
-
-    #saveCSV(businesses, 'businesses')
-    return False #True
+    saveCSV(businesses, 'businesses')
+    return True
     
 def collectHeadinfo(header):
 
@@ -406,7 +406,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup):
             if elem.select_one('svg') == None and elem.getText() != "":
                 attributes.append(elem.getText())
 
-        print(attributes)
+        data['Attributes Has'] = attributes
 
     except:
         pass
@@ -448,5 +448,5 @@ def timeToNumber(ts: str):
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-# collectPages()
+collectPages()
 
