@@ -230,36 +230,61 @@ def collectPages():
     print("Collect Pages")
     businesses = readCSV('businesses')
 
+    errors = 0
+
     hasNext = True
     while hasNext:
-        hasNext = collectPage(businesses)
+        try:
+            hasNext = collectPage(businesses, errors)
+        except:
+            errors = errors + 1
+            print('errors: ', errors)
 
-def collectPage(businesses: pd.DataFrame):
-    # Get Location name
+def collectPage(businesses: pd.DataFrame, errors: int):
+    # Get Business Url
     indexes = businesses[businesses['Loaded'] == False].index.tolist()
     print(len(indexes))
-    if len(indexes) == 0:
+    if len(indexes) == errors:
         return False
-    businessID = indexes[0]
+    businessID = indexes[errors]
     url = businesses.iloc[businessID]['Url']
 
     # Start to collect the Page
-    soup = httpProxyRequest(url, False)
+    try:
+        soup = httpProxyRequest(url, False)
 
-    if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
-        print('Sorry, you’re not allowed to access this page.')
-        return False
+        if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
+            print('Sorry, you’re not allowed to access this page.')
+            return False
 
-    #driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
-    #soup = BeautifulSoup(driver.page_source, 'html.parser')
+        #driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
+        #soup = BeautifulSoup(driver.page_source, 'html.parser')
 
-    root = soup.select_one('yelp-react-root div')
-    header = root.select_one('[data-testid="photoHeader"]')
+        root = soup.select_one('yelp-react-root div')
+        header = root.select_one('[data-testid="photoHeader"]')
 
-    isPhotoHeader = True
-    if header == None:
-        isPhotoHeader = False
-        header = root.find('h1').parent.parent.parent.parent
+        isPhotoHeader = True
+        if header == None:
+            isPhotoHeader = False
+            header = root.find('h1').parent.parent.parent.parent
+    except:
+        soup = httpProxyRequest(url, False)
+
+        if (soup.getText().find('Sorry, you') != -1) and soup.getText().find(
+                're not allowed to access this page.') != -1:
+            print('Sorry, you’re not allowed to access this page.')
+            return False
+
+        # driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
+        # soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+        root = soup.select_one('yelp-react-root div')
+        header = root.select_one('[data-testid="photoHeader"]')
+
+        isPhotoHeader = True
+        if header == None:
+            isPhotoHeader = False
+            header = root.find('h1').parent.parent.parent.parent
 
     collectedHead = collectHeadinfo(header, isPhotoHeader)
     collectedBody = collectPageBody(root, header, isPhotoHeader)
@@ -354,11 +379,14 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup, isPhotoHeader):
 
     # Get Has Website
     try:
+        hasWebsite = 0
         labelElem = root.find('p', string='Business website')
         if labelElem != None:
             websiteUrlElem = labelElem.findNext('a')
             if websiteUrlElem != None:
-                data['HasWebsite'] = float(websiteUrlElem.getText().find('http') != -1)
+                hasWebsite = float(websiteUrlElem.getText().find('http') != -1)
+
+        data['HasWebsite'] = hasWebsite
     except:
         pass
 
@@ -524,5 +552,5 @@ def firstUnloadUrl():
 #this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-#collectPages()
+collectPages()
 
