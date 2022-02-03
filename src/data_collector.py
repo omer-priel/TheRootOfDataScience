@@ -3,6 +3,7 @@
 # System
 import os
 import json
+import sys
 
 # Web Scraping
 import requests
@@ -28,7 +29,8 @@ driver_options = {
     }
 }
 
-#driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=driver_options)
+
+# driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=driver_options)
 
 # Utilities Requests
 def httpRequest(url: str, useSplash: bool):
@@ -44,7 +46,8 @@ def httpRequest(url: str, useSplash: bool):
 
     return soup
 
-def httpProxyRequest(url:  str, useSplsh: bool):
+
+def httpProxyRequest(url: str, useSplsh: bool):
     if useSplsh:
         splshHost = 'https://2tgcg9vk-splash.scrapinghub.com'
         splshUsername = 'e9e31311d4144b92b99618c0b3f7a0ab'
@@ -68,9 +71,10 @@ def httpProxyRequest(url:  str, useSplsh: bool):
             verify='./zyte-proxy-ca.crt'
 
         )
-        
+
     soup = BeautifulSoup(response.content, 'html.parser')
     return soup
+
 
 def httpSeleniumRequest(url: str):
     global driver
@@ -78,12 +82,15 @@ def httpSeleniumRequest(url: str):
     driver.get(url)
     return BeautifulSoup(driver.page_source, 'html.parser')
 
+
 # Utilities Files
 def readCSV(name: str, index_label='id') -> pd.DataFrame:
     return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
 
+
 def saveCSV(df: pd.DataFrame, name: str, index_label='id'):
     df.to_csv('../data/' + name + '.csv', index_label=index_label)
+
 
 # Classes
 busines_template = {
@@ -118,8 +125,10 @@ for i in range(1, 8):
     busines_template['CountHour' + str(i)] = None
     busines_template['HasBreaks' + str(i)] = None
 
+
 def empty_busines():
     return busines_template.copy()
+
 
 # Collectors
 def collectLocations():
@@ -138,6 +147,7 @@ def collectLocations():
     saveCSV(df, 'locations')
     saveCSV(df, 'original/locations')
 
+
 def collectUrl(locations: pd.DataFrame):
     # Get Location name
     indexes = locations[locations['Loaded'] == False].index.tolist()
@@ -155,7 +165,8 @@ def collectUrl(locations: pd.DataFrame):
     startParam = 0
     url = ""
     while url != None:
-        url = 'https://www.yelp.com/search?find_loc={}&find_desc={}&start={}'.format(locationName, categoryName, startParam)
+        url = 'https://www.yelp.com/search?find_loc={}&find_desc={}&start={}'.format(locationName, categoryName,
+                                                                                     startParam)
         startParam += 10
         soup = httpRequest(url, True)
         main = soup.select_one('main ul')
@@ -166,7 +177,6 @@ def collectUrl(locations: pd.DataFrame):
                 if link.get('href').find('/biz/') != -1:
                     links.append('https://www.yelp.com' + link.get('href'))
 
-    
     print("Create Table For The Data")
 
     # Remove Duplicates Links
@@ -208,12 +218,14 @@ def collectUrl(locations: pd.DataFrame):
     saveCSV(locations, 'locations')
     return True
 
+
 def collectUrls():
     locations = readCSV('locations')
 
     hasNext = True
     while hasNext:
         hasNext = collectUrl(locations)
+
 
 def removeDuplicatesUrls():
     businesses = readCSV('businesses')
@@ -226,137 +238,162 @@ def removeDuplicatesUrls():
 
     saveCSV(businesses, 'businesses')
 
+
 def collectPages():
     print("Collect Pages")
-    businesses = readCSV('businesses')
+
+    if len(sys.argv) != 3:  # python data_collector.py <collectorNumber> <collectors>
+        print('Not have args!')
+        return None
+
+    collectorNumber = int(sys.argv[1])
+    collectors = int(sys.argv[2])
+
+    businesses = readCSV('businesses_' + str(collectorNumber))
 
     errors = 0
+    status = 1
+    while status != 0:
+        status = collectPage(businesses, errors, collectorNumber, collectors)
 
-    hasNext = True
-    while hasNext:
-        try:
-            hasNext = collectPage(businesses, errors)
-        except:
+        if status == 2:
             errors = errors + 1
             print('errors: ', errors)
 
-def collectPage(businesses: pd.DataFrame, errors: int):
-    # Get Business Url
-    indexes = businesses[businesses['Loaded'] == False].index.tolist()
-    print(len(indexes))
-    if len(indexes) == errors:
-        return False
-    businessID = indexes[errors]
-    url = businesses.iloc[businessID]['Url']
+    print('status: ' + str(status))
 
-    # Start to collect the Page
+
+def collectPage(businesses: pd.DataFrame, errors: int, collectorNumber: int, collectors: int):
+    businessID = None
     try:
-        soup = httpProxyRequest(url, False)
+        # Get Business Url
+        indexes = businesses[(businesses.index % collectors == collectorNumber) & (businesses['Loaded'] == 0)].index.tolist()
+        if len(indexes) == errors:
+            return 0
 
-        if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
-            print('Sorry, you’re not allowed to access this page.')
-            return False
+        businessID = indexes[errors]
+        print(businessID)
 
-        #driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
-        #soup = BeautifulSoup(driver.page_source, 'html.parser')
-
-        root = soup.select_one('yelp-react-root div')
-        header = root.select_one('[data-testid="photoHeader"]')
-
-        isPhotoHeader = True
-        if header == None:
-            isPhotoHeader = False
-            header = root.find('h1').parent.parent.parent.parent
+        if not businessID < len(businesses.index):
+            return 0
     except:
-        soup = httpProxyRequest(url, False)
+        return 1
 
-        if (soup.getText().find('Sorry, you') != -1) and soup.getText().find(
-                're not allowed to access this page.') != -1:
-            print('Sorry, you’re not allowed to access this page.')
-            return False
+    try:
+        url = businesses.iloc[businessID]['Url']
 
-        # driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
-        # soup = BeautifulSoup(driver.page_source, 'html.parser')
+        # Start to collect the Page
+        try:
+            soup = httpProxyRequest(url, False)
 
-        root = soup.select_one('yelp-react-root div')
-        header = root.select_one('[data-testid="photoHeader"]')
-
-        isPhotoHeader = True
-        if header == None:
-            isPhotoHeader = False
-            header = root.find('h1').parent.parent.parent.parent
-
-    collectedHead = collectHeadinfo(header, isPhotoHeader)
-    collectedBody = collectPageBody(root, header, isPhotoHeader)
-
-    for key in collectedHead:
-        businesses.at[businessID, key] = collectedHead[key]
-
-    for key in collectedBody:
-        businesses.at[businessID, key] = collectedBody[key]
-
-    # Set Collected to True
-    businesses.at[businessID, 'Loaded'] = True
-
-    saveCSV(businesses, 'businesses')
-    return True
+            if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
+                print('Sorry, you are not allowed to access this page.')
+                return 0
     
+            # driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
+            # soup = BeautifulSoup(driver.page_source, 'html.parser')
+    
+            root = soup.select_one('yelp-react-root div')
+            header = root.select_one('[data-testid="photoHeader"]')
+    
+            isPhotoHeader = True
+            if header == None:
+                isPhotoHeader = False
+                header = root.find('h1').parent.parent.parent.parent
+        except:
+            soup = httpProxyRequest(url, False)
+
+            if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
+                print('Sorry, you are not allowed to access this page.')
+                return 0
+
+            # driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
+            # soup = BeautifulSoup(driver.page_source, 'html.parser')
+
+            root = soup.select_one('yelp-react-root div')
+            header = root.select_one('[data-testid="photoHeader"]')
+
+            isPhotoHeader = True
+            if header == None:
+                isPhotoHeader = False
+                header = root.find('h1').parent.parent.parent.parent
+
+        collectedHead = collectHeadinfo(header, isPhotoHeader)
+        collectedBody = collectPageBody(root, header, isPhotoHeader)
+
+        for key in collectedHead:
+            businesses.at[businessID, key] = collectedHead[key]
+
+        for key in collectedBody:
+            businesses.at[businessID, key] = collectedBody[key]
+
+        # Set Collected to True
+        businesses.at[businessID, 'Loaded'] = 1
+
+        saveCSV(businesses, 'businesses_' + str(collectorNumber))
+        return 1
+
+    except:
+        businesses.at[businessID, 'Loaded'] = 2
+
+        saveCSV(businesses, 'businesses_' + str(collectorNumber))        
+        return 2
+
 def collectHeadinfo(header, isPhotoHeader):
+    # find "photo count" in header
+    photoCount = 0
+    if isPhotoHeader and header.find(string=re.compile('Add photo or video')) == None:
+        photoCount = header.find(string=re.compile('See \d+ photos'))
+        photoCount = int(re.findall("\d+", photoCount)[0])
 
-     # find "photo count" in header
-     photoCount = 0
-     if isPhotoHeader and header.find(string = re.compile('Add photo or video')) == None:
-        photoCount = header.find(string = re.compile('See \d+ photos'))
-        photoCount = int(re.findall("\d+",photoCount)[0])
+    # gets into where the fun stuff is so we wont have to search as much
+    headInfo = header
+    if isPhotoHeader:
+        headInfo = header.find(class_=re.compile('photo\-header\-content__.+'))
+    headInfo = headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
 
-     # gets into where the fun stuff is so we wont have to search as much
-     headInfo = header
-     if isPhotoHeader:
-        headInfo = header.find(class_ = re.compile('photo\-header\-content__.+'))
-     headInfo = headInfo.findChild().findChild(class_=re.compile('.+ arrange-unit-fill.+'))
+    # find "expensive level" in header
+    elms = headInfo.find(string=re.compile('\$+'))
+    expensiveLevel = 0
+    if elms != None:
+        expensiveLevel = len(elms)
 
-     # find "expensive level" in header
-     elms = headInfo.find(string=re.compile('\$+'))
-     expensiveLevel = 0
-     if elms != None:
-         expensiveLevel = len(elms)
+    # find the rating of the resturant
+    starRating = headInfo.find(class_=re.compile('.i-stars.+'))['aria-label']
+    starRating = float((re.findall("[0-5]\.?5?", starRating))[0])
+    starRating = int(starRating * 2)
 
-     # find the rating of the resturant
-     starRating = headInfo.find(class_=re.compile('.i-stars.+'))['aria-label']
-     starRating = float((re.findall("[0-5]\.?5?",starRating))[0])
-     starRating = int(starRating*2)
+    # find the number of ratings
+    reviews = headInfo.find(text=re.compile('.+review'))
+    reviews = int(re.findall("\d+", reviews)[0])
 
-     # find the number of ratings
-     reviews = headInfo.find(text=re.compile('.+review'))
-     reviews = int(re.findall("\d+",reviews)[0])
+    # find whether a resturant is claimed
+    isClaimed = headInfo.find(text=re.compile('.+laimed'))
+    isClaimed = (isClaimed == "Claimed")
 
-     # find whether a resturant is claimed
-     isClaimed = headInfo.find(text=re.compile('.+laimed'))
-     isClaimed = (isClaimed=="Claimed")
-
-     # only categories have this type of link as it seems
-     categorieslinks= headInfo.findAll(href=re.compile('/c/.+'))
-     categories=[]
-     for category in (categorieslinks):
+    # only categories have this type of link as it seems
+    categorieslinks = headInfo.findAll(href=re.compile('/c/.+'))
+    categories = []
+    for category in (categorieslinks):
         categories.append(category.get_text())
 
-     return {
-         "ExpensiveLevel": float(expensiveLevel),
-         "Stars": float(starRating),
-         "Claimed": float(isClaimed),
-         "Reviews": float(reviews),
-         "SubCategories": categories,
-         "Photos": float(photoCount)
-     }
+    return {
+        "ExpensiveLevel": float(expensiveLevel),
+        "Stars": float(starRating),
+        "Claimed": float(isClaimed),
+        "Reviews": float(reviews),
+        "SubCategories": categories,
+        "Photos": float(photoCount)
+    }
 
-def collectPageBody(root :BeautifulSoup, header :BeautifulSoup, isPhotoHeader):
 
+def collectPageBody(root: BeautifulSoup, header: BeautifulSoup, isPhotoHeader):
     data = {
         'Name': ' ',
         'HasWebsite': None,
         'MenuCount': None,
         'MenuStartsCount': None,  # Removed
-        'MenuReviewsCount': None, # Removed
+        'MenuReviewsCount': None,  # Removed
         'MenuPhotosCount': None,  # Removed
         'Attributes Has': None,
         'AttributesCount': None,
@@ -404,9 +441,9 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup, isPhotoHeader):
                         if len(values) > 0:
                             if values[0].getText() == 'Closed':
                                 data['CountHour' + str(dayNumber)] = 0
-                                data['HasBreak'  + str(dayNumber)] = float(0)
+                                data['HasBreak' + str(dayNumber)] = float(0)
                             else:
-                                data['HasBreak'  + str(dayNumber)] = float(len(values) - 1)
+                                data['HasBreak' + str(dayNumber)] = float(len(values) - 1)
 
                                 countHour = 0
                                 firstOpenHour = None
@@ -458,6 +495,7 @@ def collectPageBody(root :BeautifulSoup, header :BeautifulSoup, isPhotoHeader):
         pass
 
     return data
+
 
 time_open_select = [
     '12:00 AM', '12:30 AM',
@@ -520,8 +558,8 @@ time_end_select = [
     '6:00 AM (Next day)', '6:30 AM (Next day)',
 ]
 
-def timeToNumber(ts: str, is_first: bool):
 
+def timeToNumber(ts: str, is_first: bool):
     global time_open_select
     global time_end_select
 
@@ -530,10 +568,26 @@ def timeToNumber(ts: str, is_first: bool):
     else:
         return time_end_select.index(ts)
 
+
+def combineData(collectors):
+    businesses = readCSV('businesses')
+    for i in np.arange(collectors):
+        print('i: ', i)
+        try:
+            businessesAdd = readCSV('businesses_' + str(i))
+            indexes = businessesAdd[(businessesAdd['Loaded'] != 0) & (businesses['Loaded'] == 0)].index
+            print('len: ', len(indexes))
+            businesses.iloc[indexes] = businessesAdd.iloc[indexes]
+            print('len 2: ', len(businesses[businesses['Loaded'] == 2]))
+        except:
+            print('error!')
+    saveCSV(businesses, 'businesses')
+
+
 # Tests
 def firstUnloadUrl():
     businesses = readCSV('businesses')
-    indexes = businesses[businesses['Loaded'] == False].index.tolist()
+    indexes = businesses[businesses['Loaded'] == 0].index.tolist()
     print(len(indexes))
     if len(indexes) == 0:
         return None
@@ -541,16 +595,16 @@ def firstUnloadUrl():
     url = businesses.iloc[businessID]['Url']
     return url
 
+
 # Entry Point
 
-#collectLocations()
+# collectLocations()
 
-#collectUrls()
+# collectUrls()
 
-#removeDuplicatesUrls()
+# removeDuplicatesUrls()
 
-#this i made
+# this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-collectPages()
-
+#collectPages()
