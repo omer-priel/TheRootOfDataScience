@@ -239,15 +239,16 @@ def removeDuplicatesUrls():
     saveCSV(businesses, 'businesses')
 
 
-def collectPages():
+def collectPages(collectorNumber = None, collectors = None):
     print("Collect Pages")
 
-    if len(sys.argv) != 3:  # python data_collector.py <collectorNumber> <collectors>
-        print('Not have args!')
-        return None
-
-    collectorNumber = int(sys.argv[1])
-    collectors = int(sys.argv[2])
+    if collectors == None:
+        if len(sys.argv) != 3:  # python data_collector.py <collectorNumber> <collectors>
+            print('Not have args!')
+            return None
+        collectors = int(sys.argv[2])
+    if collectorNumber == None:
+        collectorNumber = int(sys.argv[1])
 
     businesses = readCSV('businesses_' + str(collectorNumber))
 
@@ -268,7 +269,7 @@ def collectPage(businesses: pd.DataFrame, errors: int, collectorNumber: int, col
     try:
         # Get Business Url
         indexes = businesses[(businesses.index % collectors == collectorNumber) & (businesses['Loaded'] == 0)].index.tolist()
-        if len(indexes) == errors:
+        if len(indexes) <= errors:
             return 0
 
         businessID = indexes[errors]
@@ -276,7 +277,8 @@ def collectPage(businesses: pd.DataFrame, errors: int, collectorNumber: int, col
 
         if not businessID < len(businesses.index):
             return 0
-    except:
+    except Exception as inst:
+        print('except 1: ', inst)
         return 1
 
     try:
@@ -575,7 +577,7 @@ def combineData(collectors):
         print('i: ', i)
         try:
             businessesAdd = readCSV('businesses_' + str(i))
-            indexes = businessesAdd[(businessesAdd['Loaded'] != 0) & (businesses['Loaded'] == 0)].index
+            indexes = businessesAdd[(businessesAdd['Loaded'] == 1) & (businesses['Loaded'] == 0)].index
             print('len: ', len(indexes))
             businesses.iloc[indexes] = businessesAdd.iloc[indexes]
             print('len 2: ', len(businesses[businesses['Loaded'] == 2]))
@@ -583,6 +585,7 @@ def combineData(collectors):
             print('error!')
     saveCSV(businesses, 'businesses')
 
+# businesses.drop(index=businesses[businesses['Loaded'] != 1].index, inplace=True)
 
 # Tests
 def firstUnloadUrl():
@@ -604,7 +607,4 @@ def firstUnloadUrl():
 
 # removeDuplicatesUrls()
 
-# this i made
-
-# 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-collectPages()
+# collectPages()
