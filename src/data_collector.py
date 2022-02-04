@@ -607,4 +607,4 @@ def firstUnloadUrl():
 # this i made
 
 # 'https://www.yelp.com/biz/farmhouse-kitchen-thai-cuisine-san-francisco'
-#collectPages()
+collectPages()
