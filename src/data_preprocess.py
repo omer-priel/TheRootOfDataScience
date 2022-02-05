@@ -13,6 +13,5 @@ import seaborn as sns
 def reorganizeIndex():
     df=pd.read_csv('data\\businesses.csv')
     df[id]=df.index
-    print(df[id].tail())
     df.to_csv('data\\businessestmp.csv')
 #reorganizeIndex()
