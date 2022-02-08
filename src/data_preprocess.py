@@ -19,6 +19,18 @@ import seaborn as sns
 
 # reorganize_index()
 
+
+# takes as input the api dataframe which includes a row of attributes and a row of names and the orignal data frame
+# returns the original dataframe with a collumn for each attribute
+# kinda slow
+def addattr(apidf:pd.DataFrame,originaldf:pd.DataFrame):
+    for index, row in apidf.iterrows():
+        attributes=row["attributes"]
+        if not (attributes==None):
+            for attr in attributes:
+                originaldf.loc[originaldf["Name"]==row["name"],attr]=attributes[attr]
+    return originaldf
+
 # Utilities Files
 def read_csv(name: str, index_label='id') -> pd.DataFrame:
     return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
