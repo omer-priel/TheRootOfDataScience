@@ -5,12 +5,12 @@
     "api": "https://www.yelp.com/developers/documentation/v3/business_search",
     "api_in_github": "https://github.com/Yelp/yelp-python",
 
+    "Kaggle Dataset": "https://www.kaggle.com/yelp-dataset/yelp-dataset/version/3?select=yelp_academic_dataset_business.json",
 
     "All Locations": "https://www.yelp.com/locations",
     "Business Search": "https://www.yelp.com/search?find_loc={location}&start={start}",
     "Business Search Category": "https://www.yelp.com/search?find_desc={category}find_loc={location}&&start={start}",
     "Business Format": "https://www.yelp.com/biz/{sub-name}",
-
 
     "examples": [
         "https://www.yelp.com/biz/lily-san-francisco?osq=Restaurants",
