@@ -18,23 +18,13 @@ import urllib.parse
 import numpy as np
 import pandas as pd
 
-# Load selenium driver
+# Consts
 DRIVER_PATH = 'C:\\Projects\\Python\\TheRootOfDataScience\\bin\\chromedriver_win32\\chromedriver.exe'
 
-driver_options = {
-    'proxy': {
-        'http': "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-        'https': "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
-        'no_proxy': "localhost,127.0.0.1",
-    }
-}
-
-
-# driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=driver_options)
 
 # Utilities Requests
-def httpRequest(url: str, useSplash: bool):
-    if useSplash:
+def http_request(url: str, use_splash: bool) -> BeautifulSoup:
+    if use_splash:
         print(url)
         url = urllib.parse.quote(url)
         url = 'http://192.168.1.117:8050/render.html?url=' + url
@@ -47,16 +37,16 @@ def httpRequest(url: str, useSplash: bool):
     return soup
 
 
-def httpProxyRequest(url: str, useSplsh: bool):
-    if useSplsh:
-        splshHost = 'https://2tgcg9vk-splash.scrapinghub.com'
-        splshUsername = 'e9e31311d4144b92b99618c0b3f7a0ab'
+def http_proxy_request(url: str, use_splash: bool) -> BeautifulSoup:
+    if use_splash:
+        splash_host = 'https://2tgcg9vk-splash.scrapinghub.com'
+        splash_username = 'e9e31311d4144b92b99618c0b3f7a0ab'
 
-        fullUrl = splshHost + '/render.html'
+        full_url = splash_host + '/render.html'
 
         response = requests.get(
-            fullUrl,
-            auth=(splshUsername, ''),
+            full_url,
+            auth=(splash_username, ''),
             params={
                 'url': url
             }
@@ -76,24 +66,36 @@ def httpProxyRequest(url: str, useSplsh: bool):
     return soup
 
 
-def httpSeleniumRequest(url: str):
-    global driver
+def create_selenium_driver() -> seleniumwire.webdriver.Chrome:
+    driver_options = {
+        'proxy': {
+            'http': "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+            'https': "http://771c716e95864cda990b52bac3f61b8d:@proxy.crawlera.com:8011/",
+            'no_proxy': "localhost,127.0.0.1",
+        }
+    }
 
+    driver = seleniumwire.webdriver.Chrome(DRIVER_PATH, seleniumwire_options=driver_options)
+
+    return driver
+
+
+def http_selenium_request(url: str, driver: seleniumwire.webdriver.Chrome) -> BeautifulSoup:
     driver.get(url)
     return BeautifulSoup(driver.page_source, 'html.parser')
 
 
 # Utilities Files
-def readCSV(name: str, index_label='id') -> pd.DataFrame:
+def read_csv(name: str, index_label='id') -> pd.DataFrame:
     return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
 
 
-def saveCSV(df: pd.DataFrame, name: str, index_label='id'):
+def save_csv(df: pd.DataFrame, name: str, index_label='id'):
     df.to_csv('../data/' + name + '.csv', index_label=index_label)
 
 
 # Classes
-busines_template = {
+business_template = {
     'Name': None,
     'Url': None,
     'Loaded': None,
@@ -120,19 +122,19 @@ busines_template = {
 }
 
 for i in range(1, 8):
-    busines_template['OpenHour' + str(i)] = None
-    busines_template['EndHour' + str(i)] = None
-    busines_template['CountHour' + str(i)] = None
-    busines_template['HasBreaks' + str(i)] = None
+    business_template['OpenHour' + str(i)] = None
+    business_template['EndHour' + str(i)] = None
+    business_template['CountHour' + str(i)] = None
+    business_template['HasBreaks' + str(i)] = None
 
 
-def empty_busines():
-    return busines_template.copy()
+def empty_business() -> dict:
+    return business_template.copy()
 
 
 # Collectors
-def collectLocations():
-    soup = httpRequest('https://www.yelp.com/locations', False)
+def collect_locations():
+    soup = http_request('https://www.yelp.com/locations', False)
     links = soup.select('.cities a')
     locations = []
     while len(links) > 0:
@@ -144,33 +146,34 @@ def collectLocations():
     df = pd.DataFrame({'Name': locations.tolist(), 'Collected': np.full(len(locations), False)})
     df.drop(index=df.tail(8).index, inplace=True)
 
-    saveCSV(df, 'locations')
-    saveCSV(df, 'original/locations')
+    save_csv(df, 'locations')
+    save_csv(df, 'original/locations')
 
 
-def collectUrl(locations: pd.DataFrame):
+def collect_url(locations: pd.DataFrame) -> bool:
     # Get Location name
     indexes = locations[locations['Loaded'] == False].index.tolist()
     if len(indexes) == 0:
         return False
-    locationID = indexes[0]
-    locationName = locations.iloc[locationID]['Name']
+    location_id = indexes[0]
+    location_name = locations.iloc[location_id]['Name']
 
     # Start to Collect Urls
-    categoryName = 'Restaurants'
-    print('Collactting \"' + categoryName + '\" in \"' + locationName + '\"')
+    category_name = 'Restaurants'
+    print('Collecting \"' + category_name + '\" in \"' + location_name + '\"')
 
     links = []
 
-    startParam = 0
+    start_param = 0
     url = ""
-    while url != None:
-        url = 'https://www.yelp.com/search?find_loc={}&find_desc={}&start={}'.format(locationName, categoryName,
-                                                                                     startParam)
-        startParam += 10
-        soup = httpRequest(url, True)
+    while url is not None:
+        url = 'https://www.yelp.com/search?find_loc={}&find_desc={}&start={}'.format(
+            location_name, category_name, start_param)
+
+        start_param += 10
+        soup = http_request(url, True)
         main = soup.select_one('main ul')
-        if main == None:
+        if main is None:
             url = None
         else:
             for link in main.select('a'):
@@ -183,52 +186,52 @@ def collectUrl(locations: pd.DataFrame):
     links = list(set(links))
 
     # Save Urls
-    businesses = readCSV('businesses')
+    businesses = read_csv('businesses')
 
     new_businesses = pd.Series(links)
 
-    businesses_data = empty_busines()
+    businesses_data = empty_business()
 
     for key in businesses_data:
         businesses_data[key] = np.full(len(links), None)
 
     businesses_data['Loaded'] = np.full(len(links), False)
     businesses_data['Url'] = new_businesses.tolist()
-    businesses_data['Category'] = np.full(len(links), categoryName)
+    businesses_data['Category'] = np.full(len(links), category_name)
 
     businesses_data['Name'] = businesses_data['Name'].astype(str)
     businesses_data['SubCategories'] = businesses_data['SubCategories'].astype(object)
     businesses_data['Attributes Has'] = businesses_data['Attributes Has'].astype(object)
-    for i in businesses_data.index:
-        businesses_data.at[i, 'Name'] = ' '
-        businesses_data.at[i, 'SubCategories'] = []
-        businesses_data.at[i, 'Attributes Has'] = []
 
     df = pd.DataFrame(businesses_data)
-
     df.index += len(businesses.index)
+
+    for i in df.index:
+        df.at[i, 'Name'] = ' '
+        df.at[i, 'SubCategories'] = []
+        df.at[i, 'Attributes Has'] = []
 
     businesses = pd.concat([businesses, df])
 
     print("Save New Businesses to load")
-    saveCSV(businesses, 'businesses')
+    save_csv(businesses, 'businesses')
 
     # Set Collected to True
-    locations.at[[locationID], 'Collected'] = True
-    saveCSV(locations, 'locations')
+    locations.at[[location_id], 'Collected'] = True
+    save_csv(locations, 'locations')
     return True
 
 
-def collectUrls():
-    locations = readCSV('locations')
+def collect_urls():
+    locations = read_csv('locations')
 
-    hasNext = True
-    while hasNext:
-        hasNext = collectUrl(locations)
+    has_next = True
+    while has_next:
+        has_next = collect_url(locations)
 
 
-def removeDuplicatesUrls():
-    businesses = readCSV('businesses')
+def remove_duplicates_urls():
+    businesses = read_csv('businesses')
     print('Before remove ' + str(len(businesses.index)))
 
     businesses.drop_duplicates(subset='Url', keep='first', inplace=True)
@@ -236,26 +239,26 @@ def removeDuplicatesUrls():
 
     print('After remove ' + str(len(businesses.index)))
 
-    saveCSV(businesses, 'businesses')
+    save_csv(businesses, 'businesses')
 
 
-def collectPages(collectorNumber = None, collectors = None):
+def collect_pages(collector_number=None, collectors=None):
     print("Collect Pages")
 
-    if collectors == None:
+    if collectors is None:
         if len(sys.argv) != 3:  # python data_collector.py <collectorNumber> <collectors>
             print('Not have args!')
             return None
         collectors = int(sys.argv[2])
-    if collectorNumber == None:
-        collectorNumber = int(sys.argv[1])
+    if collector_number is None:
+        collector_number = int(sys.argv[1])
 
-    businesses = readCSV('businesses_' + str(collectorNumber))
+    businesses = read_csv('businesses_' + str(collector_number))
 
     errors = 0
     status = 1
     while status != 0:
-        status = collectPage(businesses, errors, collectorNumber, collectors)
+        status = collect_page(businesses, errors, collector_number, collectors)
 
         if status == 2:
             errors = errors + 1
@@ -264,48 +267,51 @@ def collectPages(collectorNumber = None, collectors = None):
     print('status: ' + str(status))
 
 
-def collectPage(businesses: pd.DataFrame, errors: int, collectorNumber: int, collectors: int):
-    businessID = None
+def collect_page(businesses: pd.DataFrame, errors: int, collector_number: int, collectors: int):
+    business_id = None
     try:
         # Get Business Url
-        indexes = businesses[(businesses.index % collectors == collectorNumber) & (businesses['Loaded'] == 0)].index.tolist()
+        indexes = businesses[
+            (businesses.index % collectors == collector_number) & (businesses['Loaded'] == 0)].index.tolist()
         if len(indexes) <= errors:
             return 0
 
-        businessID = indexes[errors]
-        print(businessID)
+        business_id = indexes[errors]
+        print(business_id)
 
-        if not businessID < len(businesses.index):
+        if not business_id < len(businesses.index):
             return 0
     except Exception as inst:
         print('except 1: ', inst)
         return 1
 
     try:
-        url = businesses.iloc[businessID]['Url']
+        url = businesses.iloc[business_id]['Url']
 
         # Start to collect the Page
         try:
-            soup = httpProxyRequest(url, False)
+            soup = http_proxy_request(url, False)
 
-            if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
+            if (soup.getText().find('Sorry, you') != -1) and soup.getText().find(
+                    're not allowed to access this page.') != -1:
                 print('Sorry, you are not allowed to access this page.')
                 return 0
-    
+
             # driver.execute_script('document.querySelector(\'section[aria-label="Amenities and More"] button[aria-controls]\').click();')
             # soup = BeautifulSoup(driver.page_source, 'html.parser')
-    
+
             root = soup.select_one('yelp-react-root div')
             header = root.select_one('[data-testid="photoHeader"]')
-    
-            isPhotoHeader = True
-            if header == None:
-                isPhotoHeader = False
+
+            is_photo_header = True
+            if header is None:
+                is_photo_header = False
                 header = root.find('h1').parent.parent.parent.parent
         except:
-            soup = httpProxyRequest(url, False)
+            soup = http_proxy_request(url, False)
 
-            if (soup.getText().find('Sorry, you') != -1) and soup.getText().find('re not allowed to access this page.') != -1:
+            if (soup.getText().find('Sorry, you') != -1) and soup.getText().find(
+                    're not allowed to access this page.') != -1:
                 print('Sorry, you are not allowed to access this page.')
                 return 0
 
@@ -315,33 +321,34 @@ def collectPage(businesses: pd.DataFrame, errors: int, collectorNumber: int, col
             root = soup.select_one('yelp-react-root div')
             header = root.select_one('[data-testid="photoHeader"]')
 
-            isPhotoHeader = True
-            if header == None:
-                isPhotoHeader = False
+            is_photo_header = True
+            if header is None:
+                is_photo_header = False
                 header = root.find('h1').parent.parent.parent.parent
 
-        collectedHead = collectHeadinfo(header, isPhotoHeader)
-        collectedBody = collectPageBody(root, header, isPhotoHeader)
+        collected_head = collect_head_info(header, is_photo_header)
+        collected_body = collect_page_body(root, header, is_photo_header)
 
-        for key in collectedHead:
-            businesses.at[businessID, key] = collectedHead[key]
+        for key in collected_head:
+            businesses.at[business_id, key] = collected_head[key]
 
-        for key in collectedBody:
-            businesses.at[businessID, key] = collectedBody[key]
+        for key in collected_body:
+            businesses.at[business_id, key] = collected_body[key]
 
         # Set Collected to True
-        businesses.at[businessID, 'Loaded'] = 1
+        businesses.at[business_id, 'Loaded'] = 1
 
-        saveCSV(businesses, 'businesses_' + str(collectorNumber))
+        save_csv(businesses, 'businesses_' + str(collector_number))
         return 1
 
     except:
-        businesses.at[businessID, 'Loaded'] = 2
+        businesses.at[collector_number, 'Loaded'] = 2
 
-        saveCSV(businesses, 'businesses_' + str(collectorNumber))        
+        save_csv(businesses, 'businesses_' + str(collector_number))
         return 2
 
-def collectHeadinfo(header, isPhotoHeader):
+
+def collect_head_info(header, isPhotoHeader):
     # find "photo count" in header
     photoCount = 0
     if isPhotoHeader and header.find(string=re.compile('Add photo or video')) == None:
@@ -389,7 +396,7 @@ def collectHeadinfo(header, isPhotoHeader):
     }
 
 
-def collectPageBody(root: BeautifulSoup, header: BeautifulSoup, isPhotoHeader):
+def collect_page_body(root: BeautifulSoup, header: BeautifulSoup, is_photo_header):
     data = {
         'Name': ' ',
         'HasWebsite': None,
@@ -410,22 +417,22 @@ def collectPageBody(root: BeautifulSoup, header: BeautifulSoup, isPhotoHeader):
 
     # Get Name
     try:
-        nameElem = header.select_one('h1')
-        if nameElem != None:
-            data['Name'] = nameElem.getText()
+        name_elem = header.select_one('h1')
+        if name_elem is not None:
+            data['Name'] = name_elem.getText()
     except:
         pass
 
     # Get Has Website
     try:
-        hasWebsite = 0
-        labelElem = root.find('p', string='Business website')
-        if labelElem != None:
-            websiteUrlElem = labelElem.findNext('a')
-            if websiteUrlElem != None:
-                hasWebsite = float(websiteUrlElem.getText().find('http') != -1)
+        has_website = 0
+        label_elem = root.find('p', string='Business website')
+        if label_elem is not None:
+            website_url_elem = label_elem.findNext('a')
+            if website_url_elem is not None:
+                has_website = float(website_url_elem.getText().find('http') != -1)
 
-        data['HasWebsite'] = hasWebsite
+        data['HasWebsite'] = has_website
     except:
         pass
 
@@ -434,50 +441,50 @@ def collectPageBody(root: BeautifulSoup, header: BeautifulSoup, isPhotoHeader):
         labels = root.select('table tr th p')
 
         if len(labels) == 7:
-            dayNumber = 1
+            day_number = 1
             for i in [6, 0, 1, 2, 3, 4, 5]:
                 try:
-                    valueCell = labels[i].parent.parent.select_one('td')
-                    if valueCell != None:
-                        values = valueCell.select('li')
+                    value_cell = labels[i].parent.parent.select_one('td')
+                    if value_cell is not None:
+                        values = value_cell.select('li')
                         if len(values) > 0:
                             if values[0].getText() == 'Closed':
-                                data['CountHour' + str(dayNumber)] = 0
-                                data['HasBreak' + str(dayNumber)] = float(0)
+                                data['CountHour' + str(day_number)] = 0
+                                data['HasBreak' + str(day_number)] = float(0)
                             else:
-                                data['HasBreak' + str(dayNumber)] = float(len(values) - 1)
+                                data['HasBreak' + str(day_number)] = float(len(values) - 1)
 
-                                countHour = 0
-                                firstOpenHour = None
-                                lastEndHour = None
+                                count_hour = 0
+                                first_open_hour = None
+                                last_end_hour = None
 
                                 for j in range(len(values)):
                                     sp = values[j].getText().split(' - ')
-                                    openHour = timeToNumber(sp[0], True)
-                                    endHour = timeToNumber(sp[1], False)
+                                    open_hour = time_to_number(sp[0], True)
+                                    end_hour = time_to_number(sp[1], False)
 
-                                    if firstOpenHour == None:
-                                        firstOpenHour = openHour
-                                    lastEndHour = endHour
+                                    if first_open_hour is None:
+                                        first_open_hour = open_hour
+                                    last_end_hour = end_hour
 
-                                    countHour += endHour - openHour
+                                    count_hour += end_hour - open_hour
 
-                                data['OpenHour' + str(dayNumber)] = firstOpenHour
-                                data['EndHour' + str(dayNumber)] = lastEndHour
-                                data['CountHour' + str(dayNumber)] = countHour
+                                data['OpenHour' + str(day_number)] = first_open_hour
+                                data['EndHour' + str(day_number)] = last_end_hour
+                                data['CountHour' + str(day_number)] = count_hour
                 except:
                     pass
-                dayNumber += 1
+                day_number += 1
     except:
         pass
 
     # Get Attributes
     try:
-        attributesPanel = root.select('section[aria-label="Amenities and More"] > div')[1]
-        attributesSubPanel = attributesPanel.findChild('div').findChild('div').findChild('div')
+        attributes_panel = root.select('section[aria-label="Amenities and More"] > div')[1]
+        attributes_sub_panel = attributes_panel.findChild('div').findChild('div').findChild('div')
         attributes = []
-        for elem in attributesSubPanel.select('div span'):
-            if elem.select_one('svg') == None and elem.getText() != "":
+        for elem in attributes_sub_panel.select('div span'):
+            if elem.select_one('svg') is None and elem.getText() != "":
                 attributes.append(elem.getText())
 
         data['Attributes Has'] = attributes
@@ -489,9 +496,9 @@ def collectPageBody(root: BeautifulSoup, header: BeautifulSoup, isPhotoHeader):
     # Get QuestionsCount
     try:
         label = root.select_one('h4:-soup-contains(\"Frequently Asked Questions about \")')
-        questionsParent = label.parent.parent.parent
-        questionsCount = len(questionsParent.select('p[data-font-weight="bold"]'))
-        data['QuestionsCount'] = float(questionsCount)
+        questions_parent = label.parent.parent.parent
+        questions_count = len(questions_parent.select('p[data-font-weight="bold"]'))
+        data['QuestionsCount'] = float(questions_count)
 
     except:
         pass
@@ -561,7 +568,7 @@ time_end_select = [
 ]
 
 
-def timeToNumber(ts: str, is_first: bool):
+def time_to_number(ts: str, is_first: bool):
     global time_open_select
     global time_end_select
 
@@ -571,40 +578,40 @@ def timeToNumber(ts: str, is_first: bool):
         return time_end_select.index(ts)
 
 
-def combineData(collectors):
-    businesses = readCSV('businesses')
+def combine_data(collectors):
+    businesses = read_csv('businesses')
     for i in np.arange(collectors):
         print('i: ', i)
         try:
-            businessesAdd = readCSV('businesses_' + str(i))
-            indexes = businessesAdd[(businessesAdd['Loaded'] == 1) & (businesses['Loaded'] == 0)].index
+            businesses_add = read_csv('businesses_' + str(i))
+            indexes = businesses_add[(businesses_add['Loaded'] != 0) & (businesses['Loaded'] == 0)].index
             print('len: ', len(indexes))
-            businesses.iloc[indexes] = businessesAdd.iloc[indexes]
+            businesses.iloc[indexes] = businesses_add.iloc[indexes]
             print('len 2: ', len(businesses[businesses['Loaded'] == 2]))
         except:
             print('error!')
-    saveCSV(businesses, 'businesses')
+    save_csv(businesses, 'businesses')
 
-# businesses.drop(index=businesses[businesses['Loaded'] != 1].index, inplace=True)
 
 # Tests
-def firstUnloadUrl():
-    businesses = readCSV('businesses')
+def first_unload_url():
+    businesses = read_csv('businesses')
     indexes = businesses[businesses['Loaded'] == 0].index.tolist()
     print(len(indexes))
     if len(indexes) == 0:
         return None
-    businessID = indexes[0]
-    url = businesses.iloc[businessID]['Url']
+    business_id = indexes[0]
+    url = businesses.iloc[business_id]['Url']
     return url
-
 
 # Entry Point
 
-# collectLocations()
+# collect_locations()
 
-# collectUrls()
+# collect_urls()
 
-# removeDuplicatesUrls()
+# remove_duplicates_urls()
 
-# collectPages()
+# collect_pages()
+
+# businesses.drop(index=businesses[businesses['Loaded'] != 1].index, inplace=True)

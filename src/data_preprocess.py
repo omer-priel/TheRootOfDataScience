@@ -10,8 +10,10 @@ import pandas as pd
 # View
 import matplotlib.pyplot as plt
 import seaborn as sns
-def reorganizeIndex():
-    df=pd.read_csv('data\\businesses.csv')
-    df[id]=df.index
-    df.to_csv('data\\businessestmp.csv')
-#reorganizeIndex()
+
+def reorganize_index():
+    df = pd.read_csv('../data/businesses.csv')
+    df[id] = df.index
+    df.to_csv('../data/businessestmp.csv')
+
+# reorganize_index()
