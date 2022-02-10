@@ -12,6 +12,7 @@ import pandas as pd
 # View
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sqlalchemy import true
 
 #
 #def reorganize_index():
@@ -69,15 +70,20 @@ def findUniqCat(df:pd.DataFrame):
 # gets name of column and a dataframe
 def strToList(df:pd.DataFrame,name:str):
     for i in range(len(df[name])):
-        string= df[name][i]
-        df.at[i,name]= ast.literal_eval(string)
+        string = df[name][i]
+        df.at[i,name] = ast.literal_eval(string)
 
 def isinlist(lis,obj):
     return obj in lis
 def createSubCat(collumns:list):
     vectfunc= np.vectorize(isinlist)
     for subcat in collumns:
-        df[subcat]=vectfunc(df['SubCategories'],subcat)
-createSubCat(findUniqCat())
+        df[subcat] = vectfunc(df['SubCategories'],subcat)
+
+
+subcategories=findUniqCat()
+createSubCat(subcategories)
+df.drop(columns='',inplace=true)
+
 # Save
 save_csv(df, 'businessestmp')
