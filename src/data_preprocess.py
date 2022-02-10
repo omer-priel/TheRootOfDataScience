@@ -124,7 +124,6 @@ def findUniqCat(df:pd.DataFrame):
 def strToList(df: pd.DataFrame, name: str):
     for i in range(len(df[name])):
         string = df[name][i]
-<<<<<<< HEAD
         df.at[i,name] = ast.literal_eval(string)
 
 def isinlist(lis,obj):
@@ -137,18 +136,6 @@ def createSubCat(collumns:list):
     return newdf
 
 
-=======
-        df.at[i, name] = ast.literal_eval(string)
-
-def isinlist(lis, obj):
-    return obj in lis
-
-
-def createSubCat(collumns:list):
-    vectfunc= np.vectorize(isinlist)
-    for subcat in collumns:
-        df[subcat] = vectfunc(df['SubCategories'], subcat)
->>>>>>> 335ce4a275535dd715d3cf7d64f9a6dbd320f46e
 
 
 # Entry Point
@@ -267,13 +254,12 @@ f = open('../data/attributes_names_importent.txt', 'w', encoding='utf8')
 for name in arr:
     f.write(name + '\n')
 f.close()
-<<<<<<< HEAD
 #handle subcategories
 subcategories=findUniqCat()
-createSubCat(subcategories)
-df.drop(columns='',inplace=true)
-=======
->>>>>>> 335ce4a275535dd715d3cf7d64f9a6dbd320f46e
+pd.concat([df,createSubCat(subcategories)],axis= 1)
+df.drop(columns= '',inplace= True)
+vectlength=np.vectorize(len)
+df["catergories_count"]= vectlength(df['SubCategories'])
 
 # Save
 save_csv(df, 'businessestmp')
