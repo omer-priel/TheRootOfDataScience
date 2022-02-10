@@ -1,6 +1,7 @@
 # Data Preprocess (Clean the data)
 
 # System
+import ast
 from enum import unique
 import os
 
@@ -58,30 +59,25 @@ for i in df[df.isna()['Attributes Has']].index:
 
 # find all unique subcategories kinda faster with string
 def findUniqCat(df:pd.DataFrame):
-    categories = df["SubCategories"].astype("string").unique()
+    categories = df["SubCategories"].unique()
     tmp = []
     for i in range(len(categories)):
-        string = categories[i].replace("[","")
-        string = string.replace("]","")
-        string = string.replace("'","")
-        tmp = tmp + string.split(",")
+        tmp = tmp + categories[i]
     tmp = np.array(tmp)
     return np.unique(tmp)
 # turn a column containing a string represantation of list into list
 # gets name of column and a dataframe
 def strToList(df:pd.DataFrame,name:str):
     for i in range(len(df[name])):
-        string = df[name][i].replace("[","")
-        string = string.replace("]","")
-        string = string.replace("'","")
-        df.at[i,name]=string.split(",")
+        string= df[name][i]
+        df.at[i,name]= ast.literal_eval(string)
 
-# create a collumn for each item in a list based on a function which takes a dict and a name as an argument
-# not finished
-def createCollumns(func:function,collumns:list,argument:dict):
-    vectfunc= np.vectorize()
-    for collumn in collumns:
-        df[collumn]=vectfunc(argument,collumn)
-
+def isinlist(lis,obj):
+    return obj in lis
+def createSubCat(collumns:list):
+    vectfunc= np.vectorize(isinlist)
+    for subcat in collumns:
+        df[subcat]=vectfunc(df['SubCategories'],subcat)
+createSubCat(findUniqCat())
 # Save
 save_csv(df, 'businessestmp')
