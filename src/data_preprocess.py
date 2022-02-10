@@ -132,14 +132,13 @@ def strToList(df: pd.DataFrame, name: str):
 def isinlist(lis,obj):
     return obj in lis
 def createSubCat(collumns:list):
+    newdf=pd.DataFrame()
     vectfunc= np.vectorize(isinlist)
     for subcat in collumns:
-        df[subcat] = vectfunc(df['SubCategories'],subcat)
+        newdf[subcat] = vectfunc(df['SubCategories'],subcat)
+    return newdf
 
 
-subcategories=findUniqCat()
-createSubCat(subcategories)
-df.drop(columns='',inplace=true)
 
 
 # Entry Point
@@ -254,6 +253,10 @@ f = open('../data/attributes_names_importent.txt', 'w', encoding='utf8')
 for name in arr:
     f.write(name + '\n')
 f.close()
+#handle subcategories
+subcategories=findUniqCat()
+createSubCat(subcategories)
+df.drop(columns='',inplace=true)
 
 # Save
 save_csv(df, 'businessestmp')
