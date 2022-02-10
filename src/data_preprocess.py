@@ -110,6 +110,12 @@ def create_businesses_has_extra_data():
     save_csv(df, 'businesses_has_extra_data')
 
 
+def change_column_location(df: pd.DataFrame, name: str, index: int):
+    column_to_move = df.pop(name)
+
+    df.insert(index, name, column_to_move)
+    return df
+
 # find all unique subcategories kinda faster with string
 def find_uniq_cat(df: pd.DataFrame):
     categories = df["SubCategories"].unique()
@@ -147,11 +153,15 @@ def convert_str_to_list(value):
 def create_sub_cat(df: pd.DataFrame):
     column_names = find_uniq_cat(df)
 
-    new_df = pd.DataFrame(columns = column_names)
+    column_full_names = []
+    for sub_cat in column_names:
+        column_full_names.append('Cat_' + sub_cat)
+
+    new_df = pd.DataFrame(columns = column_full_names)
     vect_func = np.vectorize(is_in_list)
 
     for sub_cat in column_names:
-        new_df[sub_cat] = vect_func(df['SubCategories'], sub_cat)
+        new_df['Cat_' + sub_cat] = vect_func(df['SubCategories'], sub_cat)
 
     df = pd.concat([df, new_df], axis=1)
 
@@ -180,7 +190,10 @@ df.index = np.arange(len(df.index))
 # Remove extra columns
 df.drop(columns=['MenuCount', 'MenuStartsCount', 'MenuReviewsCount', 'MenuPhotosCount'], inplace=True)
 
-df.drop(columns=['Loaded'], inplace=True)
+for day in range(1, 8):
+    df.drop(columns=['HasBreaks' + str(day)], inplace=True)
+
+df.drop(columns=['Loaded', 'Category'], inplace=True)
 
 # Add Attributes Columns
 df['At_Reservations'] = np.full(len(df.index), -1)
@@ -336,6 +349,75 @@ f.close()
 print('Handle subcategories')
 df = create_sub_cat(df)
 
+# Handle Time
+names_open_end = []
+names_count_hour = []
+names_has_break = []
+for day in range(1, 8):
+    names_open_end.append('OpenHour' + str(day))
+    names_open_end.append('EndHour' + str(day))
+    names_count_hour.append('CountHour' + str(day))
+    names_has_break.append('HasBreak' + str(day))
+
+for name in names_open_end:
+    df[name].fillna(-1, inplace=True)
+
+for name in (names_count_hour + names_has_break):
+    df[name].fillna(0, inplace=True)
+
+# WeeklyHours WeeklyDays WeeklyBreaks
+df.rename({'OpenDaysCount': 'WeeklyHours'}, axis='columns', inplace=True)
+df.rename({'HasBreaks': 'WeeklyBreaks'}, axis='columns', inplace=True)
+
+df['WeeklyDays'] = 0
+df['WeeklyHours'] = df['CountHour1']
+df['WeeklyBreaks'] = df['HasBreak1']
+
+for day in range(2, 8):
+    df['WeeklyDays'] = df['WeeklyDays'] + (df['CountHour' + str(day)] > 0)
+    df['WeeklyHours'] = df['WeeklyHours'] + df['CountHour' + str(day)]
+    df['WeeklyBreaks'] = df['WeeklyBreaks'] + df['HasBreak' + str(day)]
+
+
+# Relocate columns
+first_names = [
+    'Name', 'Url',
+    'ExpensiveLevel',
+    'Claimed', 'HasWebsite',
+    'Stars', 'Reviews', 'Photos',
+    'SubCategoriesCount', 'AttributesCount',
+    'QuestionsCount',
+    'WeeklyHours', 'WeeklyBreaks', 'WeeklyDays',
+]
+
+for day in range(1, 8):
+    first_names.append('OpenHour' + str(day))
+    first_names.append('EndHour' + str(day))
+    first_names.append('CountHour' + str(day))
+    first_names.append('HasBreak' + str(day))
+
+first_names = first_names + ['SubCategories', 'AttributesHas']
+
+for index, name in enumerate(first_names):
+    df = change_column_location(df, name, index)
+
+# Change types
+change_to_float = df.columns.to_list()
+not_float = [
+    'Name', 'Url',
+    'SubCategories', 'AttributesHas'
+]
+
+for name in not_float:
+    change_to_float.remove(name)
+
+for name in change_to_float:
+    df[name] = df[name].astype(float)
+
+df.index = np.arange(len(df.index))
+
 # Save
 print('Saving')
-save_csv(df, 'temp/businessestmp')
+save_csv(df, 'businesses')
+
+print('Complit')

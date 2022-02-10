@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 # Consts
-DRIVER_PATH = 'C:\\Projects\\Python\\TheRootOfDataScience\\bin\\chromedriver_win32\\chromedriver.exe'
+DRIVER_PATH = os.path.abspath('../bin/chromedriver_win32/chromedriver.exe')
 
 
 # Utilities Requests
