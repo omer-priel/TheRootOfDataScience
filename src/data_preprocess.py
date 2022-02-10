@@ -13,6 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
 # Utilities Files
 def read_csv(name: str, index_label='id') -> pd.DataFrame:
     return pd.read_csv('../data/' + name + '.csv', index_col=index_label)
@@ -110,32 +111,56 @@ def create_businesses_has_extra_data():
 
 
 # find all unique subcategories kinda faster with string
-def findUniqCat(df:pd.DataFrame):
+def find_uniq_cat(df: pd.DataFrame):
     categories = df["SubCategories"].unique()
-    tmp = []
-    for i in range(len(categories)):
-        tmp = tmp + categories[i]
-    tmp = np.array(tmp)
-    return np.unique(tmp)
+    uniq_cat = []
+    for category in categories:
+        if type(category) == str:
+            category = json.loads(category.replace('\'', '\"'))
+        uniq_cat += category
+
+    if '' in uniq_cat:
+        uniq_cat.remove('')
+
+    uniq_cat = np.array(uniq_cat)
+    uniq_cat = np.unique(uniq_cat)
+    return uniq_cat
 
 
 # turn a column containing a string represantation of list into list
 # gets name of column and a dataframe
-def strToList(df: pd.DataFrame, name: str):
+def str_to_list(df: pd.DataFrame, name: str):
     for i in range(len(df[name])):
         string = df[name][i]
-        df.at[i,name] = ast.literal_eval(string)
+        df.at[i, name] = ast.literal_eval(string)
 
-def isinlist(lis,obj):
+
+def is_in_list(lis, obj):
     return obj in lis
-def createSubCat(collumns:list):
-    newdf=pd.DataFrame()
-    vectfunc= np.vectorize(isinlist)
-    for subcat in collumns:
-        newdf[subcat] = vectfunc(df['SubCategories'],subcat)
-    return newdf
 
 
+def convert_str_to_list(value):
+    if type(value) == str:
+        return json.loads(value.replace('\'', '\"'))
+    return value
+
+def create_sub_cat(df: pd.DataFrame):
+    column_names = find_uniq_cat(df)
+
+    new_df = pd.DataFrame(columns = column_names)
+    vect_func = np.vectorize(is_in_list)
+
+    for sub_cat in column_names:
+        new_df[sub_cat] = vect_func(df['SubCategories'], sub_cat)
+
+    df = pd.concat([df, new_df], axis=1)
+
+    df['SubCategories'] = df['SubCategories'].apply(convert_str_to_list)
+
+    vect_length = np.vectorize(len)
+    df["SubCategoriesCount"] = vect_length(df['SubCategories'])
+    
+    return df
 
 
 # Entry Point
@@ -145,6 +170,7 @@ pd.set_option('display.width', 1000)
 pd.set_option('display.max_columns', 15)
 
 # Load the Data
+print('Load the Data')
 df = read_csv('businesses')
 
 # Remove Duplicates
@@ -155,11 +181,6 @@ df.index = np.arange(len(df.index))
 df.drop(columns=['MenuCount', 'MenuStartsCount', 'MenuReviewsCount', 'MenuPhotosCount'], inplace=True)
 
 df.drop(columns=['Loaded'], inplace=True)
-
-# Handle subcategories
-#subcategories = findUniqCat(df)
-#createSubCat(subcategories)
-#df.drop(columns='', inplace=True)
 
 # Add Attributes Columns
 df['At_Reservations'] = np.full(len(df.index), -1)
@@ -310,12 +331,11 @@ f = open('../data/temp/attributes_names_importent.txt', 'w', encoding='utf8')
 for name in arr:
     f.write(name + '\n')
 f.close()
-#handle subcategories
-subcategories=findUniqCat()
-pd.concat([df,createSubCat(subcategories)],axis= 1)
-df.drop(columns= '',inplace= True)
-vectlength=np.vectorize(len)
-df["catergories_count"]= vectlength(df['SubCategories'])
+
+# Handle subcategories
+print('Handle subcategories')
+df = create_sub_cat(df)
 
 # Save
+print('Saving')
 save_csv(df, 'temp/businessestmp')
