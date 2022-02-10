@@ -164,6 +164,47 @@ df['At_Reservations'] = np.full(len(df.index), -1)
 df['At_Delivery'] = np.full(len(df.index), -1)
 df['At_Takeout'] = np.full(len(df.index), -1)
 
+df['At_HealthScoreHas'] = np.full(len(df.index), 0)
+df['At_HealthScoreLevelNumber'] = np.full(len(df.index), -1)
+df['At_HealthScoreLevelOther'] = np.full(len(df.index), -1)
+
+health_score_levels_other = [
+    'A',
+    'B',
+    'NA',
+    'GN',
+    'Green',
+    'Compliant',
+    'Estimated Health Score',
+    'Excellent',
+    'Fair',
+    'Good',
+    'In Compliance',
+    'In Violation',
+    'Inspected & Permitted',
+    'Marginal',
+    'Non-Compliance/Case Closed',
+    'Not compliant',
+    'Pass',
+    'Unacceptable',
+    'Undetermined'
+]
+
+other_importent_attributes = [
+    'Accepts Credit Cards',
+    'Accepts Debit Cards',
+    'All staff fully vaccinated',
+    'Good for Groups',
+    'Many Vegetarian Options',
+    'Masks required',
+    'Outdoor Seating',
+    'Staff wears masks',
+    'Vegan Options'
+]
+
+for attribute in other_importent_attributes:
+    df['At_' + attribute] = np.full(len(df.index), 0)
+
 # Handle Attributes
 df.rename({'Attributes Has': 'AttributesHas'}, axis='columns', inplace=True)
 
@@ -208,6 +249,21 @@ for i in df.index:
         df.at[i, 'At_Takeout'] = 1
     elif 'No Takeout' in attributes_has:
         df.at[i, 'At_Takeout'] = 0
+
+    if 'Health Score' in attributes_has or 'Estimated Health Score' in attributes_has:
+        df.at[i, 'At_HealthScoreHas'] = 1
+
+        for attribute in attributes_has:
+            if attribute.find(' out of 100') != -1:
+                df.at[i, 'At_HealthScoreLevelNumber'] = float(attribute.replace(' out of 100', ''))
+                break
+            elif attribute in health_score_levels_other:
+                df.at[i, 'At_HealthScoreLevelOther'] = health_score_levels_other.index(attribute)
+                break
+
+    for attribute in other_importent_attributes:
+        if attribute in attributes_has:
+            df.at[i, 'At_' + attribute] = 1
 
 attributes_names_orignal = sorted(attributes_names_orignal)
 attributes_names = sorted(attributes_names)
