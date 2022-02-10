@@ -1,0 +1,221 @@
+100 out of 100
+60 out of 100
+61 out of 100
+66 out of 100
+68 out of 100
+70 out of 100
+71 out of 100
+72 out of 100
+73 out of 100
+74 out of 100
+75 out of 100
+77 out of 100
+78 out of 100
+79 out of 100
+80 out of 100
+81 out of 100
+82 out of 100
+83 out of 100
+84 out of 100
+85 out of 100
+86 out of 100
+86.5 out of 100
+87 out of 100
+88 out of 100
+88.5 out of 100
+89 out of 100
+90 out of 100
+90.5 out of 100
+91 out of 100
+91.5 out of 100
+92 out of 100
+92.5 out of 100
+93 out of 100
+93.5 out of 100
+94 out of 100
+94.5 out of 100
+95 out of 100
+95.5 out of 100
+96 out of 100
+96.5 out of 100
+97 out of 100
+97.5 out of 100
+98 out of 100
+98.5 out of 100
+99 out of 100
+99.5 out of 100
+A
+Accepts Android Pay
+Accepts Apple Pay
+Accepts Credit Cards
+Accepts Cryptocurrency
+Accepts Debit Cards
+All staff fully vaccinated
+B
+Beer & Wine Only
+Best nights on Friday
+Best nights on Saturday
+Best nights on Sunday
+Best nights on Thursday
+Bike Parking
+Black-owned
+By Appointment Only
+Casual
+Casual Dress
+Casual, Classy
+Casual, Classy, Upscale
+Casual, Intimate
+Casual, Intimate, Romantic, Classy, Upscale
+Casual, Romantic
+Casual, Touristy
+Casual, Touristy, Trendy
+Casual, Trendy
+Casual, Trendy, Classy
+Casual, Trendy, Intimate
+Casual, Trendy, Intimate, Classy
+Casual, Trendy, Intimate, Romantic
+Casual, Trendy, Intimate, Romantic, Classy
+Casual, Trendy, Intimate, Romantic, Classy, Upscale
+Casual, Trendy, Romantic
+Casual, Trendy, Upscale
+Classy
+Classy, Casual
+Classy, Upscale
+Compliant
+Covered outdoor seating
+DJ
+Dairy-Free Options
+Delivery-only
+Divey
+Divey, Casual
+Dogs Allowed
+Dogs Not Allowed
+Dressy
+Drive-Thru
+Estimated Health Score
+Excellent
+Fair
+Free Wi-Fi
+Full Bar
+GN
+Garage Parking
+Garage Parking, Private Lot Parking
+Garage Parking, Street Parking
+Garage Parking, Street Parking, Private Lot Parking
+Garage Parking, Street Parking, Validated Parking
+Garage Parking, Validated Parking, Private Lot Parking
+Garage Parking, Validated Parking, Private Lot Parking, Valet Parking
+Gender-neutral restrooms
+Gluten-Free Options
+Good
+Good For Dancing
+Good For Kids
+Good for Dinner
+Good for Groups
+Good for Late Night
+Good for Lunch
+Good for Working
+Green
+Halal Options
+Happy Hour Specials
+Health Score
+Heated outdoor seating
+Hipster
+Hipster, Casual
+Hipster, Casual, Trendy
+Hipster, Casual, Trendy, Classy
+Hipster, Casual, Trendy, Intimate
+Hipster, Casual, Trendy, Intimate, Classy
+Hipster, Casual, Trendy, Romantic
+Hipster, Classy
+Hipster, Intimate
+Hipster, Intimate, Romantic, Classy
+Hipster, Trendy
+In Compliance
+In Violation
+Inspected & Permitted
+Intimate
+Intimate, Casual
+Intimate, Classy
+Intimate, Classy, Upscale
+Intimate, Trendy, Classy
+Keto Options
+Kosher Options
+Latinx-owned
+Limited Vegetarian Options
+Live Music
+Loud
+Many Vegetarian Options
+Marginal
+Masks required
+Moderate Noise
+Music Videos
+NA
+No Alcohol
+No Bike Parking
+No Delivery
+No Drive-Thru
+No Happy Hour
+No Outdoor Seating
+No Reservations
+No Smoking
+No Takeout
+No Vegetarian Options
+No Violations Found
+No Waiter Service
+No Wi-Fi
+Non-Compliance/Case Closed
+Not Good For Groups
+Not Good For Kids
+Not compliant
+Offers Catering
+Offers Delivery
+Offers Takeout
+Open to All
+Outdoor Seating
+Pass
+Pescatarian Options
+Pool Table
+Private Lot Parking
+Proof of vaccination required
+Quiet
+Romantic
+Romantic, Classy
+Romantic, Classy, Upscale
+Romantic, Upscale, Classy, Casual
+Soy-Free Options
+Staff wears masks
+Street Parking
+Street Parking, Private Lot Parking
+TV
+Takes Reservations
+Touristy
+Touristy, Trendy, Intimate, Romantic, Classy
+Touristy, Upscale, Classy
+Trendy
+Trendy, Casual
+Trendy, Classy
+Trendy, Classy, Casual
+Trendy, Intimate, Romantic, Classy
+Trendy, Intimate, Upscale
+Trendy, Romantic, Classy
+Trendy, Romantic, Classy, Upscale
+Trendy, Upscale
+Unacceptable
+Undetermined
+Upscale
+Upscale, Casual
+Upscale, Classy
+Valet Parking
+Valet Parking, Garage Parking
+Valet Parking, Garage Parking, Street Parking, Private Lot Parking
+Valet Parking, Street Parking
+Valet Parking, Street Parking, Validated Parking
+Validated Parking
+Vegan Options
+Very Loud
+Violations Found
+Virtual restaurant
+Waiter Service
+Wheelchair Accessible
+Women-owned
