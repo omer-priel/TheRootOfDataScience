@@ -155,9 +155,9 @@ df.drop(columns=['MenuCount', 'MenuStartsCount', 'MenuReviewsCount', 'MenuPhotos
 df.drop(columns=['Loaded'], inplace=True)
 
 # Handle subcategories
-subcategories = findUniqCat()
-createSubCat(subcategories)
-df.drop(columns='', inplace=True)
+#subcategories = findUniqCat(df)
+#createSubCat(subcategories)
+#df.drop(columns='', inplace=True)
 
 # Add Attributes Columns
 df['At_Reservations'] = np.full(len(df.index), -1)
@@ -169,16 +169,16 @@ df.rename({'Attributes Has': 'AttributesHas'}, axis='columns', inplace=True)
 
 df['AttributesHas'] = df['AttributesHas'].astype(object)
 
-for i in df[df.isna()['Attributes Has']].index:
-    df.at[i, 'Attributes Has'] = np.arange(0)
+for i in df[df.isna()['AttributesHas']].index:
+    df.at[i, 'AttributesHas'] = np.arange(0)
     df.at[i, 'AttributesCount'] = 0
 
 attributes_names_orignal = []
 attributes_names = []
 
-arrs = df.index
-for i in arrs:
-    df.at[i, 'AttributesHas'] = json.loads(df.at[i, 'AttributesHas'].replace('\'', '\"'))
+for i in df.index:
+    if type(df.at[i, 'AttributesHas']) is str:
+        df.at[i, 'AttributesHas'] = json.loads(df.at[i, 'AttributesHas'].replace('\'', '\"'))
     attributes_has = []
 
     for attributes_has_elem in df.at[i, 'AttributesHas']:
@@ -212,12 +212,12 @@ for i in arrs:
 attributes_names_orignal = sorted(attributes_names_orignal)
 attributes_names = sorted(attributes_names)
 
-f = open('../data/attributes_names_orignal.txt', 'w', encoding='utf8')
+f = open('../data/temp/attributes_names_orignal.txt', 'w', encoding='utf8')
 for name in attributes_names_orignal:
     f.write(name + '\n')
 f.close()
 
-f = open('../data/attributes_names.txt', 'w', encoding='utf8')
+f = open('../data/temp/attributes_names.txt', 'w', encoding='utf8')
 for name in attributes_names:
     f.write(name + '\n')
 f.close()
@@ -248,10 +248,10 @@ arr = []
 for name in index:
     arr.append(name.replace('ExtraAt_', ''))
 
-f = open('../data/attributes_names_importent.txt', 'w', encoding='utf8')
+f = open('../data/temp/attributes_names_importent.txt', 'w', encoding='utf8')
 for name in arr:
     f.write(name + '\n')
 f.close()
 
 # Save
-save_csv(df, 'businessestmp')
+save_csv(df, 'temp/businessestmp')
