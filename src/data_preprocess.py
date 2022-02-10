@@ -1,10 +1,9 @@
 # Data Preprocess (Clean the data)
 
 # System
-import ast
-from enum import unique
 import os
 import json
+import ast
 
 # Data
 import numpy as np
@@ -13,8 +12,6 @@ import pandas as pd
 # View
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sqlalchemy import true
-
 
 # Utilities Files
 def read_csv(name: str, index_label='id') -> pd.DataFrame:
@@ -127,6 +124,7 @@ def findUniqCat(df:pd.DataFrame):
 def strToList(df: pd.DataFrame, name: str):
     for i in range(len(df[name])):
         string = df[name][i]
+<<<<<<< HEAD
         df.at[i,name] = ast.literal_eval(string)
 
 def isinlist(lis,obj):
@@ -139,6 +137,18 @@ def createSubCat(collumns:list):
     return newdf
 
 
+=======
+        df.at[i, name] = ast.literal_eval(string)
+
+def isinlist(lis, obj):
+    return obj in lis
+
+
+def createSubCat(collumns:list):
+    vectfunc= np.vectorize(isinlist)
+    for subcat in collumns:
+        df[subcat] = vectfunc(df['SubCategories'], subcat)
+>>>>>>> 335ce4a275535dd715d3cf7d64f9a6dbd320f46e
 
 
 # Entry Point
@@ -158,6 +168,11 @@ df.index = np.arange(len(df.index))
 df.drop(columns=['MenuCount', 'MenuStartsCount', 'MenuReviewsCount', 'MenuPhotosCount'], inplace=True)
 
 df.drop(columns=['Loaded'], inplace=True)
+
+# Handle subcategories
+subcategories = findUniqCat()
+createSubCat(subcategories)
+df.drop(columns='', inplace=True)
 
 # Add Attributes Columns
 df['At_Reservations'] = np.full(len(df.index), -1)
@@ -242,7 +257,6 @@ for name in attributes_names:
 # Any attributes with les 500 samples is extraordinary
 # So we need to consider only attributes with more the 500 samples
 
-# TEMP
 index = df[arr].sum()[df[arr].sum() >= 500].index
 
 arr = []
@@ -253,10 +267,13 @@ f = open('../data/attributes_names_importent.txt', 'w', encoding='utf8')
 for name in arr:
     f.write(name + '\n')
 f.close()
+<<<<<<< HEAD
 #handle subcategories
 subcategories=findUniqCat()
 createSubCat(subcategories)
 df.drop(columns='',inplace=true)
+=======
+>>>>>>> 335ce4a275535dd715d3cf7d64f9a6dbd320f46e
 
 # Save
 save_csv(df, 'businessestmp')
