@@ -4,6 +4,10 @@ Lior Shiboli
 <br />
 Omer Priel
 
+# Images
+![Sory](./images/Sorry.png)
+![Data Collectors](./images/Data_Collectors.png)
+
 # Road Map
 
 ## data Collection
