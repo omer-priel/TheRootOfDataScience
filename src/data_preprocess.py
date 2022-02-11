@@ -349,6 +349,9 @@ f.close()
 print('Handle subcategories')
 df = create_sub_cat(df)
 
+#handle has expensive level
+df["has_exp_level"]=np.where(df["ExpensiveLevel"]==0,True,False)
+
 # Handle Time
 names_open_end = []
 names_count_hour = []
