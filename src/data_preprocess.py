@@ -384,7 +384,7 @@ for day in range(2, 8):
 
 # Relocate columns
 first_names = [
-    'Name', 'Url',
+    'Name', 'Url','has_exp_level',
     'ExpensiveLevel',
     'Claimed', 'HasWebsite',
     'Stars', 'Reviews', 'Photos',
