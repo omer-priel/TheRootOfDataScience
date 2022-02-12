@@ -181,7 +181,7 @@ pd.set_option('display.max_columns', 15)
 
 # Load the Data
 print('Load the Data')
-df = read_csv('businesses')
+df = read_csv('businesses_raw')
 
 # Remove Duplicates
 df.drop_duplicates(subset=['Name'], inplace=True)
@@ -350,7 +350,7 @@ print('Handle subcategories')
 df = create_sub_cat(df)
 
 #handle has expensive level
-df["has_exp_level"]=np.where(df["ExpensiveLevel"]==0,True,False)
+df["HasExpensiveLevel"]=np.where(df["ExpensiveLevel"]==0,True,False)
 
 # Handle Time
 names_open_end = []
@@ -384,7 +384,7 @@ for day in range(2, 8):
 
 # Relocate columns
 first_names = [
-    'Name', 'Url','has_exp_level',
+    'Name', 'Url','HasExpensiveLevel',
     'ExpensiveLevel',
     'Claimed', 'HasWebsite',
     'Stars', 'Reviews', 'Photos',
