@@ -304,15 +304,15 @@ for i in df.index:
 attributes_names_orignal = sorted(attributes_names_orignal)
 attributes_names = sorted(attributes_names)
 
-f = open('../data/temp/attributes_names_orignal.txt', 'w', encoding='utf8')
-for name in attributes_names_orignal:
-    f.write(name + '\n')
-f.close()
+#f = open('../data/temp/attributes_names_orignal.txt', 'w', encoding='utf8')
+#for name in attributes_names_orignal:
+#    f.write(name + '\n')
+#f.close()
 
-f = open('../data/temp/attributes_names.txt', 'w', encoding='utf8')
-for name in attributes_names:
-    f.write(name + '\n')
-f.close()
+#f = open('../data/temp/attributes_names.txt', 'w', encoding='utf8')
+#for name in attributes_names:
+#    f.write(name + '\n')
+#f.close()
 
 for name in attributes_names:
     df.insert(len(df.columns), 'ExtraAt_' + name, np.full(len(df.index), 0))
@@ -340,17 +340,17 @@ arr = []
 for name in index:
     arr.append(name.replace('ExtraAt_', ''))
 
-f = open('../data/temp/attributes_names_importent.txt', 'w', encoding='utf8')
-for name in arr:
-    f.write(name + '\n')
-f.close()
+#f = open('../data/temp/attributes_names_importent.txt', 'w', encoding='utf8')
+#for name in arr:
+#    f.write(name + '\n')
+#f.close()
 
 # Handle subcategories
 print('Handle subcategories')
 df = create_sub_cat(df)
 
 #handle has expensive level
-df["HasExpensiveLevel"]=np.where(df["ExpensiveLevel"]==0,True,False)
+df["HasExpensiveLevel"] = np.where(df["ExpensiveLevel"] != 0, True, False)
 
 # Handle Time
 names_open_end = []
