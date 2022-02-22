@@ -1,40 +1,26 @@
 # The Root Of Data Science
 
-Lior Shiboli
-<br />
-Omer Priel
-
 # Images
 ![Sory](./images/Sorry.png)
 ![Data Collectors](./images/Data_Collectors.png)
 
-# Road Map
 
-## data Collection
-* Get URLs
-* Get Data
+# Conclusions
+* First first of all web scraping is fun!
 
-## First Preprocess
-* Rename Data
-* Handle Text
-* Create new Fields by other fields
+## Web scraping
+* Need (Cache System) save the requests content in files per url,<br />
+  so next time we will load the content from the file and not from requests.get
 
-* Split to "Main Train" and "Main Test"
+* To find custom key (business Name) for every row in any table, for removing duplicates,<br />
 
-* Split fields
-* Handle null fields by Remove / Fill / etc... them
+We got 27K businesses from 87K requests becase of that
 
-## Display
-* Display Target Ratio
-* Describe the Data
-* Display the Data
+## Classification Model (Has Expensive Level)
 
-## Preprocess
-* Handle Exceptions by Remove them or create different Model for them
-* Handle Text and Categorial Attributes
-* Scaling
+## Registration Model (Expensive Level)
 
-## ??? \ Visual and Description
-* Linear Correlation Matrix (Option)
-* Describe our performance metrics
-* 
+
+# Authors
+* Lior Shiboli
+* Omer Priel
